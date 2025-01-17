@@ -3,7 +3,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "student")
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +16,6 @@ public class Student {
     private String note;
     private int status;
     private int levelId;
-    @Column(name = "create_time")
     private LocalDateTime createTime;
     private long roleId;
 
