@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
-@RequestMapping("/students")
+@RequestMapping("/api/students")
 public class StudentListController {
     @Autowired
     private StudentMapper studentMapper;
@@ -20,9 +20,9 @@ public class StudentListController {
         return studentMapper.getAllStudents();
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     @ResponseBody
-    public String deleteStudent(@PathVariable Long id) {
+    public String deleteStudent(@PathVariable("id") Long id) {
         int result = studentMapper.deleteStudent(id);
         return result > 0 ? "success" : "fail";
     }
@@ -35,5 +35,14 @@ public class StudentListController {
         student.setRoleId(2); // 默认角色ID为2（学生）
         int result = studentMapper.addStudent(student);
         return result > 0 ? "success" : "fail";
+    }
+
+    @GetMapping("/search")
+    @ResponseBody
+    public List<Student> searchStudents(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String className,
+            @RequestParam(required = false) Integer status) {
+        return studentMapper.searchStudents(keyword, className, status);
     }
 }

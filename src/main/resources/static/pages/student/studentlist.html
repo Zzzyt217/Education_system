@@ -213,28 +213,18 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <input type="text" class="form-control" placeholder="搜索学生姓名/电话...">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-5">
                     <select class="form-select">
-                        <option value="">选择年级</option>
-                        <option value="1">大一</option>
-                        <option value="2">大二</option>
-                        <option value="3">大三</option>
-                        <option value="4">大四</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option value="">选择状态</option>
-                        <option value="1">在读</option>
-                        <option value="2">休学</option>
-                        <option value="3">退学</option>
+                        <option value="">选择班级</option>
+                        <option value="人工智能1班">人工智能1班</option>
+                        <option value="人工智能2班">人工智能2班</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-primary w-100">
+                    <button class="btn btn-primary w-100" onclick="searchStudents()">
                         <i class="fas fa-search"></i> 搜索
                     </button>
                 </div>
@@ -253,10 +243,9 @@
                             <th>性别</th>
                             <th>生日</th>
                             <th>电话</th>
-                            <th>邮箱</th>
                             <th>地址</th>
                             <th>状态</th>
-                            <th>年级</th>
+                            <th>班级</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -297,21 +286,12 @@
                             <input type="tel" class="form-control" name="phone" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">邮箱</label>
-                            <input type="email" class="form-control" name="email" required>
-                        </div>
-                        <div class="mb-3">
                             <label class="form-label">地址</label>
                             <input type="text" class="form-control" name="address">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">年级</label>
-                            <select class="form-select" name="levelId" required>
-                                <option value="1">大一</option>
-                                <option value="2">大二</option>
-                                <option value="3">大三</option>
-                                <option value="4">大四</option>
-                            </select>
+                            <label class="form-label">班级</label>
+                            <input type="tel" class="form-control" name="classname" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">备注</label>
@@ -355,7 +335,7 @@
 
     // 加载学生列表
     function loadStudents() {
-        fetch('/students/list')
+        fetch('/api/students/list')
             .then(response => response.json())
             .then(students => {
                 const tbody = document.querySelector('#studentTable tbody');
@@ -368,14 +348,13 @@
                         <td>${student.sex === 1 ? '男' : '女'}</td>
                         <td>${formatDate(student.birthday)}</td>
                         <td>${student.phone}</td>
-                        <td>${student.email}</td>
                         <td>${student.address || '-'}</td>
                         <td>
                             <span class="badge ${getStatusBadgeClass(student.status)}">
                                 ${getStatusText(student.status)}
                             </span>
                         </td>
-                        <td>${student.levelId}年级</td>
+                        <td>${student.className || '-'}</td>
                         <td>
                             <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
                                 <i class="fas fa-trash"></i>
@@ -416,11 +395,22 @@
     // 删除学生
     function deleteStudent(id) {
         if (confirm('确定要删除这名学生吗？此操作不可恢复。')) {
-            fetch(`/students/delete/${id}`, {
-                method: 'DELETE'
+            // 打印id值，用于调试
+            console.log('Deleting student with id:', id);
+            
+            fetch(`/api/students/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json'
+                }
             })
-            .then(response => response.text())
+            .then(response => {
+                // 打印响应状态，用于调试
+                console.log('Response status:', response.status);
+                return response.text();
+            })
             .then(result => {
+                console.log('Delete result:', result);  // 打印结果，用于调试
                 if (result === 'success') {
                     loadStudents();
                 } else {
@@ -460,18 +450,56 @@
     }
 
     // 搜索功能
-    document.querySelector('.btn-primary').addEventListener('click', function() {
+    function searchStudents() {
         const keyword = document.querySelector('input[type="text"]').value;
-        const levelId = document.querySelector('select:nth-of-type(1)').value;
-        const status = document.querySelector('select:nth-of-type(2)').value;
+        const className = document.querySelector('select').value;
 
-        let url = '/students/search?';
-        if (keyword) url += `keyword=${keyword}&`;
-        if (levelId) url += `levelId=${levelId}&`;
-        if (status) url += `status=${status}`;
+        const params = new URLSearchParams();
+        if (keyword) params.append('keyword', keyword);
+        if (className) params.append('className', className);
 
-        window.location.href = url;
-    });
+        fetch(`/api/students/search?${params.toString()}`)
+            .then(response => response.json())
+            .then(students => {
+                updateStudentTable(students);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('搜索失败，请重试');
+            });
+    }
+
+    // 更新表格内容的函数
+    function updateStudentTable(students) {
+        const tbody = document.querySelector('#studentTable tbody');
+        tbody.innerHTML = '';
+        
+        students.forEach(student => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${student.username}</td>
+                <td>${student.sex === 1 ? '男' : '女'}</td>
+                <td>${formatDate(student.birthday)}</td>
+                <td>${student.phone}</td>
+                <td>${student.address || '-'}</td>
+                <td>
+                    <span class="badge ${getStatusBadgeClass(student.status)}">
+                        ${getStatusText(student.status)}
+                    </span>
+                </td>
+                <td>${student.className || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 绑定搜索按钮点击事件
+    document.querySelector('.btn-primary').addEventListener('click', searchStudents);
 </script>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
