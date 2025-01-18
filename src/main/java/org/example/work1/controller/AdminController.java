@@ -67,4 +67,14 @@ public class AdminController {
                 })
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Admin>> searchAdmins(@RequestParam String keyword) {
+        try {
+            List<Admin> admins = adminRepository.searchAdmins(keyword);
+            return new ResponseEntity<>(admins, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

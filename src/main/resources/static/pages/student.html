@@ -224,6 +224,23 @@
             </div>
         </div>
     </div>
+
+    <!-- 保持搜索框HTML结构不变 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" class="form-control" id="searchKeyword" 
+                           placeholder="请输入学生姓名、手机号、班级或学院...">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" id="searchBtn">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -266,6 +283,8 @@
                 console.error('Error fetching student stats:', error);
             });
     });
+
+
 </script>
 </body>
 </html> 

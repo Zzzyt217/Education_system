@@ -245,21 +245,77 @@ function confirmDelete() {
     });
 }
 
-// 搜索和筛选
+// 修改搜索相关函数
 function searchStudents() {
-    const searchText = document.querySelector('.search-box input').value;
-    const major = document.querySelector('select[name="major"]').value;
-    const classId = document.querySelector('select[name="class"]').value;
+    const keyword = $('#searchKeyword').val().trim();
+    if (keyword === '') {
+        // 如果搜索框为空，加载所有学生
+        $.get("/api/student/all", function(data) {
+            updateStudentTable(data);
+        });
+        return;
+    }
     
-    loadStudents({
-        search: searchText,
-        major: major,
-        class: classId
+    $.ajax({
+        url: '/api/student/search',
+        method: 'GET',
+        data: { keyword: keyword },
+        success: function(data) {
+            updateStudentTable(data);
+        },
+        error: function(xhr) {
+            alert('搜索失败：' + xhr.statusText);
+        }
     });
 }
 
-// 为搜索和筛选添加事件监听
-document.querySelector('.search-box input').addEventListener('input', searchStudents);
-document.querySelectorAll('.filters select').forEach(select => {
-    select.addEventListener('change', searchStudents);
+// 更新表格内容的函数
+function updateStudentTable(data) {
+    var table = $("table");
+    table.find("tbody").remove();
+    var tbody = $("<tbody>");
+    $.each(data, function(index, student) {
+        tbody.append(`<tr>
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.studentId}</td>
+            <td>${student.className}</td>
+            <td>${student.major}</td>
+            <td>${student.phone}</td>
+            <td>${student.email}</td>
+            <td>
+                <button class='btn btn-primary btn-sm editStudent' data-id='${student.id}'>修改</button>
+                <button class='btn btn-danger btn-sm deleteStudent' data-id='${student.id}'>删除</button>
+            </td>
+        </tr>`);
+    });
+    table.append(tbody);
+}
+
+// 添加输入监听和防抖
+let searchTimeout;
+$('#searchKeyword').on('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        searchStudents();
+    }, 300);
+});
+
+// 添加回车搜索支持
+$('#searchKeyword').on('keypress', function(e) {
+    if (e.which === 13) { // 回车键
+        searchStudents();
+    }
+});
+
+// 保持原有的搜索按钮点击事件
+$('#searchBtn').click(function() {
+    searchStudents();
+});
+
+// 初始化时加载学生列表
+$(document).ready(function() {
+    $.get("/api/student/all", function(data) {
+        updateStudentTable(data);
+    });
 }); 

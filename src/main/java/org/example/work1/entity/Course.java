@@ -3,16 +3,32 @@ package org.example.work1.entity;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "course")
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String courseName;
-    private String place;
-    private String lessonType;
-    private int credit;
 
+    @Column(name = "coursename")
+    private String courseName;
+
+    @Column(name = "teacher_name")
     private String teacherName;
+
+    @Column(name = "startdate")
+    private String startDate;
+
+    @Column(name = "classhour")
+    private Integer classHour;
+
+    @Column(name = "place")
+    private String place;
+
+    @Column(name = "courseintroduction")
+    private String courseIntroduction;
+
+    @Column(name = "coursestatus")
+    private Integer courseStatus;
 
     // Getters and Setters
     public Long getId() {
@@ -31,6 +47,30 @@ public class Course {
         this.courseName = courseName;
     }
 
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public Integer getClassHour() {
+        return classHour;
+    }
+
+    public void setClassHour(Integer classHour) {
+        this.classHour = classHour;
+    }
+
     public String getPlace() {
         return place;
     }
@@ -39,27 +79,19 @@ public class Course {
         this.place = place;
     }
 
-    public String getLessonType() {
-        return lessonType;
+    public String getCourseIntroduction() {
+        return courseIntroduction;
     }
 
-    public void setLessonType(String lessonType) {
-        this.lessonType = lessonType;
+    public void setCourseIntroduction(String courseIntroduction) {
+        this.courseIntroduction = courseIntroduction;
     }
 
-    public int getCredit() {
-        return credit;
+    public Integer getCourseStatus() {
+        return courseStatus;
     }
 
-    public void setCredit(int credit) {
-        this.credit = credit;
-    }
-
-    public String getTeacherName() {
-        return teacherName;
-    }
-
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
+    public void setCourseStatus(Integer courseStatus) {
+        this.courseStatus = courseStatus;
     }
 }
