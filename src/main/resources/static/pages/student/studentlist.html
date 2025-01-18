@@ -213,18 +213,12 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-5">
-                    <input type="text" class="form-control" placeholder="搜索学生姓名/电话...">
-                </div>
-                <div class="col-md-5">
-                    <select class="form-select">
-                        <option value="">选择班级</option>
-                        <option value="人工智能1班">人工智能1班</option>
-                        <option value="人工智能2班">人工智能2班</option>
-                    </select>
+                <div class="col-md-10">
+                    <input type="text" class="form-control" id="searchKeyword" 
+                           placeholder="请输入学生姓名、手机号、班级或学院...">
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-primary w-100" onclick="searchStudents()">
+                    <button class="btn btn-primary w-100" id="searchBtn">
                         <i class="fas fa-search"></i> 搜索
                     </button>
                 </div>
@@ -245,6 +239,7 @@
                             <th>电话</th>
                             <th>地址</th>
                             <th>状态</th>
+                            <th>学院</th>
                             <th>班级</th>
                             <th>操作</th>
                         </tr>
@@ -291,17 +286,18 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">班级</label>
-                            <input type="tel" class="form-control" name="classname" required>
+                            <input type="text" class="form-control" name="classname" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">备注</label>
-                            <textarea class="form-control" name="note" rows="3"></textarea>
+                            <label class="form-label">学院</label>
+                            <input type="text" class="form-control" name="college" required 
+                                   placeholder="请输入学院名称">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" onclick="saveStudent()">保存</button>
+                    <button type="button" class="btn btn-primary" id="saveStudentBtn">保存</button>
                 </div>
             </div>
         </div>
@@ -331,6 +327,130 @@
     // 页面加载时获取学生列表
     document.addEventListener('DOMContentLoaded', function() {
         loadStudents();
+        
+        // 绑定搜索按钮点击事件
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            const keyword = document.getElementById('searchKeyword').value;
+            console.log('开始搜索，关键字:', keyword);
+
+            const params = new URLSearchParams();
+            if (keyword) params.append('keyword', keyword);
+            
+            const url = `/api/students/search?${params.toString()}`;
+            console.log('请求URL:', url);
+
+            fetch(url)
+                .then(response => {
+                    console.log('响应状态:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(students => {
+                    console.log('搜索结果:', students);
+                    const tbody = document.querySelector('#studentTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (students.length === 0) {
+                        console.log('没有找到匹配的学生');
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center">没有找到匹配的学生</td></tr>';
+                        return;
+                    }
+
+                    students.forEach(student => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${student.username}</td>
+                            <td>${student.sex === 1 ? '男' : '女'}</td>
+                            <td>${formatDate(student.birthday)}</td>
+                            <td>${student.phone}</td>
+                            <td>${student.address || '-'}</td>
+                            <td>
+                                <span class="badge ${getStatusBadgeClass(student.status)}">
+                                    ${getStatusText(student.status)}
+                                </span>
+                            </td>
+                            <td>${student.college || '-'}</td>
+                            <td>${student.className || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary me-1" onclick="editStudent(${student.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    console.log('表格更新完成');
+                })
+                .catch(error => {
+                    console.error('搜索错误:', error);
+                    alert('搜索失败，请重试');
+                });
+        });
+
+        // 添加保存按钮的事件监听器
+        document.getElementById('saveStudentBtn').addEventListener('click', function() {
+            try {
+                const form = document.getElementById('addStudentForm');
+                console.log('表单元素:', form);
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                const formData = {
+                    username: form.querySelector('[name="username"]').value,
+                    sex: parseInt(form.querySelector('[name="sex"]').value),
+                    birthday: form.querySelector('[name="birthday"]').value,  // 获取生日
+                    phone: form.querySelector('[name="phone"]').value,
+                    address: form.querySelector('[name="address"]').value || '',
+                    className: form.querySelector('[name="classname"]').value,
+                    college: form.querySelector('[name="college"]').value,  // 获取学院
+                    status: 1,
+                    roleId: 0,
+                    createTime: new Date().toISOString()
+                };
+
+                console.log('准备发送的数据:', formData);
+
+                fetch('/api/students/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    console.log('响应状态:', response.status);
+                    return response.text();
+                })
+                .then(result => {
+                    console.log('服务器返回结果:', result);
+                    if (result === 'success') {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addStudentModal'));
+                        modal.hide();
+                        loadStudents();
+                        form.reset();
+                        alert('添加成功！');
+                    } else {
+                        alert('添加失败，请重试');
+                    }
+                })
+                .catch(error => {
+                    console.error('请求错误:', error);
+                    alert('添加失败，请重试');
+                });
+            } catch (error) {
+                console.error('函数执行错误:', error);
+                alert('系统错误，请重试');
+            }
+        });
     });
 
     // 加载学生列表
@@ -354,8 +474,12 @@
                                 ${getStatusText(student.status)}
                             </span>
                         </td>
+                        <td>${student.college || '-'}</td>
                         <td>${student.className || '-'}</td>
                         <td>
+                            <button class="btn btn-sm btn-primary me-1" onclick="editStudent(${student.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
                             <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -365,31 +489,6 @@
                 });
             })
             .catch(error => console.error('Error:', error));
-    }
-
-    // 保存学生信息
-    function saveStudent() {
-        const form = document.getElementById('addStudentForm');
-        const formData = new FormData(form);
-        
-        fetch('/students/add', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.text())
-        .then(result => {
-            if (result === 'success') {
-                $('#addStudentModal').modal('hide');
-                loadStudents();
-                form.reset();
-            } else {
-                alert('添加失败，请重试');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('添加失败，请重试');
-        });
     }
 
     // 删除学生
@@ -449,61 +548,12 @@
         }
     }
 
-    // 搜索功能
-    function searchStudents() {
-        const keyword = document.querySelector('input[type="text"]').value;
-        const className = document.querySelector('select').value;
-
-        const params = new URLSearchParams();
-        if (keyword) params.append('keyword', keyword);
-        if (className) params.append('className', className);
-
-        fetch(`/api/students/search?${params.toString()}`)
-            .then(response => response.json())
-            .then(students => {
-                updateStudentTable(students);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('搜索失败，请重试');
-            });
+    function editStudent(id) {
+        window.location.href = `student-info.html?id=${id}`;
     }
-
-    // 更新表格内容的函数
-    function updateStudentTable(students) {
-        const tbody = document.querySelector('#studentTable tbody');
-        tbody.innerHTML = '';
-        
-        students.forEach(student => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${student.username}</td>
-                <td>${student.sex === 1 ? '男' : '女'}</td>
-                <td>${formatDate(student.birthday)}</td>
-                <td>${student.phone}</td>
-                <td>${student.address || '-'}</td>
-                <td>
-                    <span class="badge ${getStatusBadgeClass(student.status)}">
-                        ${getStatusText(student.status)}
-                    </span>
-                </td>
-                <td>${student.className || '-'}</td>
-                <td>
-                    <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // 绑定搜索按钮点击事件
-    document.querySelector('.btn-primary').addEventListener('click', searchStudents);
 </script>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
-<script src="../../js/student.js"></script>
 </body>
 </html> 
