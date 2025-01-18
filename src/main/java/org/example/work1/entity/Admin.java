@@ -1,27 +1,35 @@
 package org.example.work1.entity;
-import javax.persistence.*;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Column;
 
 @Entity
 @Table(name = "admin_info")
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
     private String username;
     private String userpass;
     private String nickname;
-    private Long roleId;
+
+    @Column(name = "role_id") // 修改为与数据库中修改后的列名一致
+    private long roleId;
     private String roleName;
     private String sex;
     private String phone;
     private String email;
 
     // Getters and Setters
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -49,11 +57,11 @@ public class Admin {
         this.nickname = nickname;
     }
 
-    public Long getRoleId() {
+    public long getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(Long roleId) {
+    public void setRoleId(long roleId) {
         this.roleId = roleId;
     }
 
