@@ -1,59 +1,95 @@
-let currentCourseId = null;
-
-// 页面加载完成后执行
-document.addEventListener('DOMContentLoaded', function() {
-    loadTeachers();
-    loadCourses();
-});
-
-// 加载教师列表
+// 动态加载教师选项（示例函数，实际需要从后端获取数据）
 function loadTeachers() {
-    fetch('/api/teachers')
-        .then(response => response.json())
-        .then(data => {
-            const select = document.querySelector('select[name="teacherId"]');
-            select.innerHTML = '<option value="">选择教师</option>';
-            data.forEach(teacher => {
-                select.innerHTML += `<option value="${teacher.id}">${teacher.name}</option>`;
-            });
-        });
+    // 模拟从后端获取教师数据
+    const teachers = [
+        { id: 1, name: '张三' },
+        { id: 2, name: '李四' }
+    ];
+
+    const teacherSelect = document.querySelector('select[name="teacherId"]');
+    teachers.forEach(teacher => {
+        const option = document.createElement('option');
+        option.value = teacher.id;
+        option.textContent = teacher.name;
+        teacherSelect.appendChild(option);
+    });
 }
 
-// 加载课程列表
-function loadCourses(params = {}) {
-    let url = '/api/courses';
-    if (Object.keys(params).length > 0) {
-        url += '?' + new URLSearchParams(params).toString();
-    }
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            const courseList = document.querySelector('.course-list');
-            courseList.innerHTML = '';
-            data.forEach(course => {
-                courseList.innerHTML += createCourseCard(course);
-            });
-        });
+// 显示添加课程模态框
+function showAddCourse() {
+    const courseModal = new bootstrap.Modal(document.getElementById('courseModal'));
+    document.getElementById('courseModalLabel').textContent = '添加课程';
+    document.getElementById('courseForm').reset();
+    loadTeachers(); // 动态加载教师选项
+    courseModal.show();
 }
 
-// 创建课程卡片HTML
-function createCourseCard(course) {
-    return `
-        <div class="course-card">
+// 保存课程（示例函数，实际需要发送数据到后端）
+function saveCourse() {
+    const form = document.getElementById('courseForm');
+    const formData = new FormData(form);
+    // 这里需要使用 AJAX 或 fetch API 将 formData 发送到后端
+    console.log('保存课程数据:', formData);
+    const courseModal = bootstrap.Modal.getInstance(document.getElementById('courseModal'));
+    courseModal.hide();
+}
+
+// 编辑课程（示例函数，实际需要根据课程 ID 获取课程详细信息并填充表单）
+function editCourse(courseId) {
+    const courseModal = new bootstrap.Modal(document.getElementById('courseModal'));
+    document.getElementById('courseModalLabel').textContent = '编辑课程';
+    // 这里需要使用 AJAX 或 fetch API 根据 courseId 获取课程详细信息并填充表单
+    loadTeachers(); // 动态加载教师选项
+    courseModal.show();
+}
+
+// 删除课程（示例函数，实际需要发送删除请求到后端）
+function deleteCourse(courseId) {
+    const deleteConfirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    deleteConfirmModal.show();
+
+    // 确认删除
+    window.confirmDelete = function() {
+        // 这里需要使用 AJAX 或 fetch API 发送删除请求到后端
+        console.log('删除课程 ID:', courseId);
+        deleteConfirmModal.hide();
+    };
+}
+
+// 页面加载完成后执行的初始化函数
+document.addEventListener('DOMContentLoaded', function() {
+    // 动态加载教师选项
+    loadTeachers();
+
+    // 示例：模拟获取课程数据并展示
+    const courseList = document.querySelector('.course-list');
+    const courses = [
+        {
+            id: 1,
+            courseName: 'Java程序设计',
+            place: '教学楼A-301',
+            lessonType: '必修',
+            credit: 4,
+            teacherId: 1,
+            hours: 64
+        }
+    ];
+
+    courses.forEach(course => {
+        const courseCard = document.createElement('div');
+        courseCard.classList.add('course-card');
+        courseCard.innerHTML = `
             <div class="course-icon">
                 <i class="fas fa-book"></i>
             </div>
             <div class="course-info">
-                <div class="course-name">${course.name}</div>
+                <div class="course-name">${course.courseName}</div>
                 <div class="course-details">
-                    <span class="type-badge ${course.type === 'required' ? 'type-required' : 'type-optional'}">
-                        ${course.type === 'required' ? '必修' : '选修'}
-                    </span>
+                    <span class="type-badge type-${course.lessonType === '必修' ? 'required' : 'optional'}">${course.lessonType}</span>
                     <span class="credit-badge">${course.credit}学分</span>
                     <span class="course-detail">
                         <i class="fas fa-user"></i>
-                        ${course.teacherName}
+                        张三
                     </span>
                     <span class="course-detail">
                         <i class="fas fa-clock"></i>
@@ -73,185 +109,7 @@ function createCourseCard(course) {
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
-        </div>
-    `;
-}
-
-// 显示添加课程模态框
-function showAddCourse() {
-    currentCourseId = null;
-    document.getElementById('courseModalLabel').textContent = '添加课程';
-    document.getElementById('courseForm').reset();
-    new bootstrap.Modal(document.getElementById('courseModal')).show();
-}
-
-// 编辑课程
-function editCourse(id) {
-    currentCourseId = id;
-    document.getElementById('courseModalLabel').textContent = '编辑课程';
-    
-    // 获取课程详情
-    fetch(`/api/courses/${id}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('获取课程信息失败');
-            }
-            return response.json();
-        })
-        .then(course => {
-            const form = document.getElementById('courseForm');
-            // 填充表单数据
-            form.courseName.value = course.name;
-            form.startDate.value = formatDate(course.startDate);
-            form.teacherId.value = course.teacherId;
-            form.hours.value = course.hours;
-            form.place.value = course.place;
-            form.description.value = course.description || '';
-            form.status.value = course.status;
-            form.type.value = course.type;
-            form.credit.value = course.credit;
-            
-            // 显示模态框
-            new bootstrap.Modal(document.getElementById('courseModal')).show();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('获取课程信息失败，请重试');
-        });
-}
-
-// 保存课程
-function saveCourse() {
-    const form = document.getElementById('courseForm');
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    
-    // 数据处理
-    data.hours = parseInt(data.hours);
-    data.credit = parseInt(data.credit);
-    data.status = parseInt(data.status);
-    
-    const url = currentCourseId ? `/api/courses/${currentCourseId}` : '/api/courses';
-    const method = currentCourseId ? 'PUT' : 'POST';
-    
-    // 发送请求
-    fetch(url, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('保存失败');
-        }
-        return response.json();
-    })
-    .then(result => {
-        // 关闭模态框
-        bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
-        // 刷新课程列表
-        loadCourses();
-        // 显示成功提示
-        alert(currentCourseId ? '课程更新成功' : '课程添加成功');
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('保存失败，请重试');
+        `;
+        courseList.appendChild(courseCard);
     });
-}
-
-// 格式化日期
-function formatDate(dateString) {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
-}
-
-// 验证表单数据
-function validateForm(data) {
-    if (!data.courseName || data.courseName.trim() === '') {
-        alert('请输入课程名称');
-        return false;
-    }
-    if (!data.teacherId) {
-        alert('请选择授课教师');
-        return false;
-    }
-    if (!data.hours || data.hours <= 0) {
-        alert('请输入有效的课时数');
-        return false;
-    }
-    if (!data.credit || data.credit <= 0) {
-        alert('请输入有效的学分');
-        return false;
-    }
-    if (!data.place || data.place.trim() === '') {
-        alert('请输入上课地点');
-        return false;
-    }
-    return true;
-}
-
-// 重置表单
-function resetForm() {
-    const form = document.getElementById('courseForm');
-    form.reset();
-    currentCourseId = null;
-}
-
-// 添加课程按钮点击事件
-document.querySelector('.header-actions button').addEventListener('click', function() {
-    resetForm();
-    document.getElementById('courseModalLabel').textContent = '添加课程';
-    new bootstrap.Modal(document.getElementById('courseModal')).show();
 });
-
-// 为模态框添加隐藏事件监听
-document.getElementById('courseModal').addEventListener('hidden.bs.modal', function () {
-    resetForm();
-});
-
-// 删除课程
-function deleteCourse(id) {
-    currentCourseId = id;
-    new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
-}
-
-// 确认删除
-function confirmDelete() {
-    if (!currentCourseId) return;
-    
-    fetch(`/api/courses/${currentCourseId}`, {
-        method: 'DELETE'
-    })
-    .then(() => {
-        bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
-        loadCourses();
-    });
-}
-
-// 搜索课程
-function searchCourses() {
-    const searchText = document.querySelector('.search-box input').value;
-    const type = document.querySelector('select[value="type"]').value;
-    const credit = document.querySelector('select[value="credit"]').value;
-    
-    loadCourses({
-        search: searchText,
-        type: type,
-        credit: credit
-    });
-}
-
-// 为搜索和筛选添加事件监听
-document.querySelector('.search-box input').addEventListener('input', searchCourses);
-document.querySelectorAll('.filters select').forEach(select => {
-    select.addEventListener('change', searchCourses);
-}); 

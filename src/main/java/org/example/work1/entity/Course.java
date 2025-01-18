@@ -1,8 +1,6 @@
 package org.example.work1.entity;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
+import javax.persistence.*;
 
 @Entity
 public class Course {
@@ -13,7 +11,8 @@ public class Course {
     private String place;
     private String lessonType;
     private int credit;
-    private int teacherId;
+
+    private String teacherName;
 
     // Getters and Setters
     public Long getId() {
@@ -56,11 +55,11 @@ public class Course {
         this.credit = credit;
     }
 
-    public int getTeacherId() {
-        return teacherId;
+    public String getTeacherName() {
+        return teacherName;
     }
 
-    public void setTeacherId(int teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
     }
 }
