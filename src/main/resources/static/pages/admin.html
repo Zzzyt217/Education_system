@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>管理员管理</title>
@@ -14,7 +15,6 @@
             gap: 15px;
         }
 
-
         .admin-avatar {
             width: 40px;
             height: 40px;
@@ -27,45 +27,38 @@
             font-size: 20px;
         }
 
-
         .admin-info {
             flex: 1;
         }
-
 
         .admin-name {
             font-weight: 500;
             margin-bottom: 5px;
         }
 
-
         .admin-role {
             font-size: 12px;
             color: #666;
         }
-
 
         .role-badge {
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 500;
-            background: rgba(52,152,219,0.1);
+            background: rgba(52, 152, 219, 0.1);
             color: var(--primary-color);
         }
-
 
         .action-buttons {
             display: flex;
             gap: 10px;
         }
 
-
         .action-buttons.btn {
             padding: 6px 12px;
             font-size: 14px;
         }
-
 
         .logo {
             width: 40px;
@@ -74,14 +67,12 @@
             margin-right: 10px;
         }
 
-
         .sidebar-header {
             display: flex;
             align-items: center;
             padding: 20px;
             background: rgba(255, 255, 255, 0.075);
         }
-
 
         .sidebar-header h3 {
             margin: 0;
@@ -90,6 +81,7 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="sidebar">
     <div class="sidebar-header">
@@ -136,7 +128,6 @@
     </ul>
 </nav>
 
-
 <div class="main-content">
     <div class="page-header">
         <h1 class="page-title">
@@ -150,11 +141,10 @@
         </div>
     </div>
 
-
     <!-- 统计卡片 -->
     <div class="stats-cards">
         <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(52,152,219,0.1); color: var(--primary-color);">
+            <div class="stat-icon" style="background: rgba(52, 152, 219, 0.1); color: var(--primary-color);">
                 <i class="fas fa-users"></i>
             </div>
             <div class="stat-info">
@@ -164,7 +154,6 @@
         </div>
         <!-- 其他统计卡片 -->
     </div>
-
 
     <!-- 搜索和筛选 -->
     <div class="action-bar">
@@ -180,7 +169,6 @@
         </div>
     </div>
 
-
     <!-- 数据表格 -->
     <div class="card">
         <div class="card-body">
@@ -190,19 +178,234 @@
         </div>
     </div>
 </div>
+
+<!-- 添加管理员模态框 -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAdminModalLabel">添加管理员</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAdminForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userpass" class="form-label">密码</label>
+                        <input type="password" class="form-control" id="userpass" name="userpass" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nickname" class="form-label">昵称</label>
+                        <input type="text" class="form-control" id="nickname" name="nickname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roleId" class="form-label">角色ID</label>
+                        <input type="number" class="form-control" id="roleId" name="roleId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roleName" class="form-label">角色名称</label>
+                        <input type="text" class="form-control" id="roleName" name="roleName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sex" class="form-label">性别</label>
+                        <input type="text" class="form-control" id="sex" name="sex" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">电话</label>
+                        <input type="text" class="form-control" id="phone" name="phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱</label>
+                        <input type="text" class="form-control" id="email" name="email" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="saveAdminButton">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 修改管理员模态框 -->
+<div class="modal fade" id="editAdminModal" tabindex="-1" aria-labelledby="editAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAdminModalLabel">修改管理员</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAdminForm">
+                    <input type="hidden" id="editAdminId" name="id">
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">用户名</label>
+                        <input type="text" class="form-control" id="editUsername" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editUserpass" class="form-label">密码</label>
+                        <input type="password" class="form-control" id="editUserpass" name="userpass" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editNickname" class="form-label">昵称</label>
+                        <input type="text" class="form-control" id="editNickname" name="nickname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRoleId" class="form-label">角色ID</label>
+                        <input type="number" class="form-control" id="editRoleId" name="roleId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRoleName" class="form-label">角色名称</label>
+                        <input type="text" class="form-control" id="editRoleName" name="roleName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editSex" class="form-label">性别</label>
+                        <input type="text" class="form-control" id="editSex" name="sex" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPhone" class="form-label">电话</label>
+                        <input type="text" class="form-control" id="editPhone" name="phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">邮箱</label>
+                        <input type="text" class="form-control" id="editEmail" name="email" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="updateAdminButton">更新</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"></script>
+
 <script>
-    // 在页面加载时调用后端接口获取管理员统计数据
-    window.addEventListener('load', function() {
-        fetch('/admin/count')
-            .then(response => response.json())
-            .then(data => {
-                // 使用 id 选择器
-                document.getElementById('adminCount').textContent = data;
-            })
-            .catch(error => {
-                console.error('Error fetching admin stats:', error);
+    // 显示添加管理员模态框
+    function showAddAdmin() {
+        $('#addAdminModal').modal('show');
+    }
+    $(document).ready(function () {
+        // 获取管理员数量
+        $.get("/api/admin/count", function (data) {
+            $("#adminCount").text(data);
+        });
+
+        // 获取所有管理员信息
+        $.get("/api/admin/all", function (data) {
+            var table = $("table");
+            table.append("<thead><tr><th>ID</th><th>用户名</th><th>昵称</th><th>角色</th><th>性别</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody>");
+            $.each(data, function (index, admin) {
+                table.append("<tr><td>" + admin.id + "</td><td>" + admin.username + "</td><td>" + admin.nickname + "</td><td>" + admin.roleName + "</td><td>" + admin.sex + "</td><td>" + admin.phone + "</td><td>" + admin.email + "</td><td><button class='btn btn-primary btn-sm editAdmin' data-id='" + admin.id + "'>修改</button><button class='btn btn-danger btn-sm deleteAdmin' data-id='" + admin.id + "'>删除</button></td></tr>");
             });
+            table.append("</tbody>");
+        });
+
+
+
+        // 保存添加的管理员
+        $('#saveAdminButton').click(function () {
+            var formData = JSON.stringify({
+                username: $('#username').val(),
+                userpass: $('#userpass').val(),
+                nickname: $('#nickname').val(),
+                roleId: $('#roleId').val(),
+                roleName: $('#roleName').val(),
+                sex: $('#sex').val(),
+                phone: $('#phone').val(),
+                email: $('#email').val()
+            });
+            $.ajax({
+                url: '/api/admin/add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: formData,
+                success: function (response) {
+                    $('#addAdminModal').modal('hide');
+                    alert('管理员添加成功');
+                    location.reload();
+                },
+                error: function (error) {
+                    console.error('添加管理员失败', error);
+                    alert('添加管理员失败，请检查输入');
+                }
+            });
+        });
+
+        // 显示修改管理员模态框
+        $(document).on('click', '.editAdmin', function () {
+            var id = $(this).data('id');
+            $.get("/api/admin/" + id, function (admin) {
+                $('#editAdminId').val(admin.id);
+                $('#editUsername').val(admin.username);
+                $('#editUserpass').val(admin.userpass);
+                $('#editNickname').val(admin.nickname);
+                $('#editRoleId').val(admin.roleId);
+                $('#editRoleName').val(admin.roleName);
+                $('#editSex').val(admin.sex);
+                $('#editPhone').val(admin.phone);
+                $('#editEmail').val(admin.email);
+                $('#editAdminModal').modal('show');
+            });
+        });
+
+        // 更新管理员信息
+        $('#updateAdminButton').click(function () {
+            var formData = JSON.stringify({
+                id: $('#editAdminId').val(),
+                username: $('#editUsername').val(),
+                userpass: $('#editUserpass').val(),
+                nickname: $('#editNickname').val(),
+                roleId: $('#editRoleId').val(),
+                roleName: $('#editRoleName').val(),
+                sex: $('#editSex').val(),
+                phone: $('#editPhone').val(),
+                email: $('#editEmail').val()
+            });
+            var id = $('#editAdminId').val();
+            $.ajax({
+                url: '/api/admin/update/' + id,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: formData,
+                success: function (response) {
+                    $('#editAdminModal').modal('hide');
+                    alert('管理员更新成功');
+                    location.reload();
+                },
+                error: function (error) {
+                    console.error('更新管理员失败', error);
+                    alert('更新管理员失败，请检查输入');
+                }
+            });
+        });
+
+        // 删除管理员
+        $(document).on('click', '.deleteAdmin', function () {
+            var id = $(this).data('id');
+            if (confirm('确定要删除该管理员吗？')) {
+                $.ajax({
+                    url: '/api/admin/delete/' + id,
+                    type: 'DELETE',
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function (error) {
+                        console.error('删除管理员失败', error);
+                        alert('删除管理员失败，请重试');
+                    }
+                });
+            }
+        });
     });
 </script>
 </body>
+
 </html>

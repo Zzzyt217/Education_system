@@ -1,42 +1,70 @@
 package org.example.work1.controller;
 
-
-import org.example.work1.service.AdminService;
+import org.example.work1.entity.Admin;
+import org.example.work1.repository.AdminRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin")
 public class AdminController {
-
-
     @Autowired
-    private AdminService adminService;
+    private AdminRepository adminRepository;
 
-
-    @GetMapping("/admin/count")
-    public AdminStats getAdminStats() {
-        long adminCount = adminService.getAdminCount();
-        return new AdminStats(adminCount);
+    @GetMapping("/all")
+    public ResponseEntity<List<Admin>> getAllAdmins() {
+        List<Admin> admins = adminRepository.findAll();
+        return new ResponseEntity<>(admins, HttpStatus.OK);
     }
 
-
-}
-
-
-class AdminStats {
-    private long adminCount;
-
-
-    public AdminStats(long adminCount) {
-        this.adminCount = adminCount;
+    @GetMapping("/count")
+    public ResponseEntity<Long> getAdminCount() {
+        long count = adminRepository.count();
+        return new ResponseEntity<>(count, HttpStatus.OK);
     }
 
-
-    public long getAdminCount() {
-        return adminCount;
+    @PostMapping("/add")
+    public ResponseEntity<Admin> addAdmin(@RequestBody Admin admin) {
+        Admin savedAdmin = adminRepository.save(admin);
+        return new ResponseEntity<>(savedAdmin, HttpStatus.CREATED);
     }
 
+    @GetMapping("/{id}") // 新增获取单个管理员的接口
+    public ResponseEntity<Admin> getAdminById(@PathVariable int id) {
+        return adminRepository.findById(id)
+                .map(admin -> new ResponseEntity<>(admin, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Admin> updateAdmin(@PathVariable int id, @RequestBody Admin admin) {
+        return adminRepository.findById(id)
+                .map(existingAdmin -> {
+                    existingAdmin.setUsername(admin.getUsername());
+                    existingAdmin.setUserpass(admin.getUserpass());
+                    existingAdmin.setNickname(admin.getNickname());
+                    existingAdmin.setRoleId(admin.getRoleId());
+                    existingAdmin.setRoleName(admin.getRoleName());
+                    existingAdmin.setSex(admin.getSex());
+                    existingAdmin.setPhone(admin.getPhone());
+                    existingAdmin.setEmail(admin.getEmail());
+                    Admin updatedAdmin = adminRepository.save(existingAdmin);
+                    return new ResponseEntity<>(updatedAdmin, HttpStatus.OK);
+                })
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteAdmin(@PathVariable int id) {
+        return adminRepository.findById(id)
+                .map(admin -> {
+                    adminRepository.delete(admin);
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                })
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
 }
