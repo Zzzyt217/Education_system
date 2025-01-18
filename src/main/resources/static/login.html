@@ -54,6 +54,16 @@
             margin-bottom: 15px;
             display: none;
         }
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.2em;
+        }
+        
+        .login-btn:disabled {
+            background: linear-gradient(to right, #95a5a6, #7f8c8d);
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -83,11 +93,15 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
     $(document).ready(function() {
+        const $loginBtn = $('.login-btn');
+        const $errorMessage = $('#errorMessage');
+        
         $('#loginForm').on('submit', function(e) {
             e.preventDefault();
             
-            // 禁用登录按钮
-            $('.login-btn').prop('disabled', true);
+            // 禁用登录按钮并显示加载状态
+            $loginBtn.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm me-2"></span>登录中...');
             
             var username = $('#username').val();
             var password = $('#password').val();
@@ -109,33 +123,47 @@
                         window.location.href = '/pages/main.html';
                     } else {
                         console.log('登录失败:', response.message);
-                        $('#errorMessage').text(response.message).show();
-                        // 启用登录按钮
-                        $('.login-btn').prop('disabled', false);
+                        showError(response.message);
+                        resetLoginButton();
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('Ajax请求失败:', error);
-                    $('#errorMessage').text('登录失败，请重试').show();
-                    // 启用登录按钮
-                    $('.login-btn').prop('disabled', false);
+                    showError('登录失败，请重试');
+                    resetLoginButton();
                 },
-                complete: function() {
-                    // 无论成功还是失败，3秒后隐藏错误信息
-                    setTimeout(function() {
-                        $('#errorMessage').fadeOut();
-                    }, 3000);
-                }
+                // 移除 complete 回调，改为在需要的地方单独处理
             });
         });
 
+        // 显示错误信息的函数
         function showError(message) {
-            const errorDiv = $('#errorMessage');
-            errorDiv.text(message).show();
+            $errorMessage.text(message).show();
             setTimeout(function() {
-                errorDiv.fadeOut();
+                $errorMessage.fadeOut();
             }, 3000);
         }
+
+        // 重置登录按钮状态的函数
+        function resetLoginButton() {
+            $loginBtn.prop('disabled', false)
+                    .html('登录');
+        }
+
+        // 添加按键事件监听
+        $(document).on('keypress', function(e) {
+            if (e.which === 13 && !$loginBtn.prop('disabled')) {  // Enter 键且按钮未被禁用
+                $('#loginForm').submit();
+            }
+        });
+
+        // 添加输入框变化监听
+        $('#username, #password').on('input', function() {
+            // 如果按钮被禁用且两个输入框都有值，则启用按钮
+            if ($loginBtn.prop('disabled') && $('#username').val() && $('#password').val()) {
+                resetLoginButton();
+            }
+        });
     });
 </script>
 </body>

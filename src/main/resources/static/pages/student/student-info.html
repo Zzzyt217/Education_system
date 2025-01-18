@@ -132,62 +132,47 @@
     <div class="card">
         <div class="card-body">
             <form id="studentInfoForm">
+                <input type="hidden" name="id">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">学号</label>
-                        <input type="text" class="form-control" name="studentId" readonly>
-                    </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">姓名</label>
-                        <input type="text" class="form-control" name="name" required>
+                        <input type="text" class="form-control" name="username" required>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">性别</label>
-                        <select class="form-control" name="gender" required>
-                            <option value="male">男</option>
-                            <option value="female">女</option>
+                        <select class="form-select" name="sex" required>
+                            <option value="1">男</option>
+                            <option value="0">女</option>
                         </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">出生日期</label>
-                        <input type="date" class="form-control" name="birthday" required>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">专业</label>
-                        <select class="form-control" name="major" required>
-                            <option value="cs">计算机科学</option>
-                            <option value="se">软件工程</option>
-                        </select>
+                        <label class="form-label">生日</label>
+                        <input type="date" class="form-control" name="birthday" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">电话</label>
+                        <input type="tel" class="form-control" name="phone" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">学院</label>
+                        <input type="text" class="form-control" name="college" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">班级</label>
-                        <select class="form-control" name="class" required>
-                            <option value="1">2021级1班</option>
-                            <option value="2">2021级2班</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">联系电话</label>
-                        <input type="tel" class="form-control" name="phone" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">邮箱</label>
-                        <input type="email" class="form-control" name="email" required>
+                        <input type="text" class="form-control" name="classname" required>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">家庭住址</label>
+                    <label class="form-label">地址</label>
                     <input type="text" class="form-control" name="address">
                 </div>
                 <div class="text-end">
                     <button type="button" class="btn btn-secondary me-2" onclick="history.back()">返回</button>
-                    <button type="submit" class="btn btn-primary">保存修改</button>
+                    <button type="button" class="btn btn-primary" onclick="saveChanges()">保存修改</button>
                 </div>
             </form>
         </div>
@@ -197,5 +182,93 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
 <script src="../../js/student-info.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 从URL获取学生ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('id');
+    
+    if (studentId) {
+        loadStudentInfo(studentId);
+    }
+});
+
+function loadStudentInfo(id) {
+    fetch(`/api/students/${id}`)
+        .then(response => response.json())
+        .then(student => {
+            console.log('获取到的学生信息:', student);
+            const form = document.getElementById('studentInfoForm');
+            
+            form.querySelector('[name="id"]').value = student.id;
+            form.querySelector('[name="username"]').value = student.username;
+            form.querySelector('[name="sex"]').value = student.sex;
+            
+            const birthday = student.birthday ? student.birthday.split(' ')[0] : '';
+            form.querySelector('[name="birthday"]').value = birthday;
+            
+            form.querySelector('[name="phone"]').value = student.phone;
+            form.querySelector('[name="college"]').value = student.college;
+            form.querySelector('[name="classname"]').value = student.className;
+            form.querySelector('[name="address"]').value = student.address || '';
+        })
+        .catch(error => {
+            console.error('加载学生信息错误:', error);
+            alert('加载学生信息失败');
+        });
+}
+
+function saveChanges() {
+    const form = document.getElementById('studentInfoForm');
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const username = form.querySelector('[name="username"]').value;
+    if (!username) {
+        alert('姓名不能为空');
+        return;
+    }
+
+    const formData = {
+        username: username,
+        sex: parseInt(form.querySelector('[name="sex"]').value),
+        birthday: form.querySelector('[name="birthday"]').value,
+        phone: form.querySelector('[name="phone"]').value,
+        college: form.querySelector('[name="college"]').value,
+        className: form.querySelector('[name="classname"]').value,
+        address: form.querySelector('[name="address"]').value || ''
+    };
+
+    console.log('准备发送的修改数据:', formData);
+
+    fetch('/api/students/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        console.log('响应状态:', response.status);
+        return response.text();
+    })
+    .then(result => {
+        console.log('修改结果:', result);
+        if (result === 'success') {
+            alert('修改成功');
+            history.back();
+        } else {
+            alert('修改失败，请重试');
+        }
+    })
+    .catch(error => {
+        console.error('修改错误:', error);
+        alert('修改失败，请重试');
+    });
+}
+</script>
 </body>
 </html>

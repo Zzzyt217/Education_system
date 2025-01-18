@@ -19,6 +19,7 @@ public class Student {
     private LocalDateTime createTime;
     private long roleId;
     private String className;
+    private String college;
 
     // Getters and Setters
     public Long getId() {
@@ -123,5 +124,13 @@ public class Student {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public String getCollege() {
+        return college;
+    }
+
+    public void setCollege(String college) {
+        this.college = college;
     }
 }
