@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>日志管理</title>
@@ -18,7 +19,7 @@
 
         .log-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .log-header {
@@ -69,14 +70,15 @@
         }
 
         .status-success {
-            background: rgba(46,204,113,0.1);
+            background: rgba(46, 204, 113, 0.1);
             color: var(--secondary-color);
         }
 
         .status-warning {
-            background: rgba(241,196,15,0.1);
+            background: rgba(241, 196, 15, 0.1);
             color: var(--warning-color);
         }
+
         .logo {
             width: 40px;
             height: 40px;
@@ -98,154 +100,339 @@
         }
     </style>
 </head>
+
 <body>
 <nav class="sidebar">
     <div class="sidebar-header">
         <img class="logo" src="../image/blue2.png" alt="logo">
         <h3>教务管理系统</h3>
     </div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="main.html" class="nav-link">
-                        <i class="fas fa-home nav-icon"></i>
-                        <span>首页</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="admin.html" class="nav-link">
-                        <i class="fas fa-book nav-icon"></i>
-                        <span>管理员管理</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="course.html" class="nav-link">
-                        <i class="fas fa-book nav-icon"></i>
-                        <span>课程管理</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="student.html" class="nav-link">
-                        <i class="fas fa-book nav-icon"></i>
-                        <span>学生管理</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="teacher.html" class="nav-link">
-                        <i class="fas fa-book nav-icon"></i>
-                        <span>教师管理</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="log.html" class="nav-link active">
-                        <i class="fas fa-history nav-icon"></i>
-                        <span>日志管理</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="main.html" class="nav-link">
+                <i class="fas fa-home nav-icon"></i>
+                <span>首页</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="admin.html" class="nav-link">
+                <i class="fas fa-book nav-icon"></i>
+                <span>管理员管理</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="course.html" class="nav-link">
+                <i class="fas fa-book nav-icon"></i>
+                <span>课程管理</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="student.html" class="nav-link">
+                <i class="fas fa-book nav-icon"></i>
+                <span>学生管理</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="teacher.html" class="nav-link">
+                <i class="fas fa-book nav-icon"></i>
+                <span>教师管理</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="log.html" class="nav-link active">
+                <i class="fas fa-history nav-icon"></i>
+                <span>日志管理</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
-        <!-- 主内容区域 -->
-        <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">
-                    <i class="fas fa-history"></i>
-                    日志管理
-                </h1>
-                <div class="header-actions">
-                    <button class="btn btn-secondary" onclick="exportLogs()">
-                        <i class="fas fa-download"></i> 导出日志
-                    </button>
-                </div>
+<!-- 主内容区域 -->
+<div class="main-content">
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-history"></i>
+            日志管理
+        </h1>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="exportLogs()">
+                <i class="fas fa-download"></i> 导出日志
+            </button>
+        </div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(46,204,113,0.1); color: var(--secondary-color);">
+                <i class="fas fa-sign-in-alt"></i>
             </div>
-
-            <!-- 统计卡片 -->
-            <div class="stats-cards">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(46,204,113,0.1); color: var(--secondary-color);">
-                        <i class="fas fa-sign-in-alt"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>1,286</h3>
-                        <p>今日登录次数</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(52,152,219,0.1); color: var(--primary-color);">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>45</h3>
-                        <p>当前在线用户</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(231,76,60,0.1); color: var(--danger-color);">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>12</h3>
-                        <p>异常登录</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: rgba(241,196,15,0.1); color: var(--warning-color);">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>98%</h3>
-                        <p>安全退出率</p>
-                    </div>
-                </div>
+            <div class="stat-info">
+                <h3>1,286</h3>
+                <p>今日登录次数</p>
             </div>
-
-            <!-- 搜索和筛选 -->
-            <div class="action-bar">
-                <div class="search-box">
-                    <input type="text" class="form-control" placeholder="搜索日志...">
-                </div>
-                <div class="filters">
-                    <input type="date" class="form-control me-2">
-                    <select class="form-select">
-                        <option value="">所有状态</option>
-                        <option value="success">正常登录</option>
-                        <option value="warning">异常登录</option>
-                    </select>
-                </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(52,152,219,0.1); color: var(--primary-color);">
+                <i class="fas fa-users"></i>
             </div>
-
-            <!-- 日志列表 -->
-            <div class="log-list">
-                <!-- 日志卡片示例 -->
-                <div class="log-card">
-                    <div class="log-header">
-                        <div class="log-user">
-                            <div class="log-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="log-info">
-                                <div class="log-username">admin</div>
-                                <div class="log-ip">192.168.1.100</div>
-                            </div>
-                        </div>
-                        <span class="status-badge status-success">
-                            <i class="fas fa-check-circle"></i>
-                            安全退出
-                        </span>
-                    </div>
-                    <div class="log-time">
-                        <i class="fas fa-clock"></i>
-                        登录时间：2024-01-20 08:30:00
-                        <span class="mx-2">|</span>
-                        <i class="fas fa-sign-out-alt"></i>
-                        退出时间：2024-01-20 17:30:00
-                    </div>
-                </div>
+            <div class="stat-info">
+                <h3>45</h3>
+                <p>当前在线用户</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(231,76,60,0.1); color: var(--danger-color);">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>12</h3>
+                <p>异常登录</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(241,196,15,0.1); color: var(--warning-color);">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="stat-info">
+                <h3>98%</h3>
+                <p>安全退出率</p>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/log.js"></script>
+    <!-- 搜索和筛选 -->
+    <div class="action-bar">
+        <div class="search-box">
+            <input type="text" class="form-control" placeholder="搜索日志..." oninput="searchLogs()">
+        </div>
+        <div class="filters">
+            <input type="date" class="form-control me-2" onchange="filterLogs()">
+            <select class="form-select" onchange="filterLogs()">
+                <option value="">所有状态</option>
+                <option value="1">正常登录</option>
+                <option value="0">异常登录</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 日志列表 -->
+    <div class="log-list" id="log-list">
+        <!-- 日志卡片将通过JavaScript动态生成 -->
+    </div>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 示例日志数据
+    const logs = [
+        {
+            username: '张老师',
+            action: '登录系统',
+            ip: '192.168.1.100',
+            time: '2024-03-20 09:30:25',
+            status: 'success',
+            details: '正常登录，设备: Chrome浏览器'
+        },
+        {
+            username: '李同学',
+            action: '提交作业',
+            ip: '192.168.1.156',
+            time: '2024-03-20 10:15:33',
+            status: 'success',
+            details: '提交了《Java程序设计》课程作业'
+        },
+        {
+            username: '王管理员',
+            action: '修改课程信息',
+            ip: '192.168.1.88',
+            time: '2024-03-20 11:20:15',
+            status: 'warning',
+            details: '修改了课程《数据结构》的上课时间'
+        },
+        {
+            username: '赵老师',
+            action: '异常登录',
+            ip: '10.0.0.25',
+            time: '2024-03-20 13:45:10',
+            status: 'warning',
+            details: '非常用IP地址登录'
+        },
+        {
+            username: '王主任',
+            action: '新增课程',
+            ip: '192.168.1.120',
+            time: '2024-03-20 09:45:12',
+            status: 'success',
+            details: '新增课程《Python程序设计》，课程编号: CS2024001'
+        },
+        {
+            username: '李教务',
+            action: '修改课程容量',
+            ip: '192.168.1.135',
+            time: '2024-03-20 10:05:30',
+            status: 'success',
+            details: '将《数据库原理》课程容量从 60 修改为 80 人'
+        },
+        {
+            username: '张辅导员',
+            action: '学生信息变更',
+            ip: '192.168.1.168',
+            time: '2024-03-20 10:30:45',
+            status: 'success',
+            details: '更新学生 张三(2024001) 的联系方式'
+        },
+        {
+            username: '系统',
+            action: '学生选课',
+            ip: '192.168.1.200',
+            time: '2024-03-20 11:00:18',
+            status: 'warning',
+            details: '学生 李四(2024015) 选课《高等数学》失败，原因：课程人数已满'
+        },
+        {
+            username: '陈院长',
+            action: '教师任命',
+            ip: '192.168.1.88',
+            time: '2024-03-20 11:15:22',
+            status: 'success',
+            details: '任命王教授为计算机科学系主任'
+        },
+        {
+            username: '教务处',
+            action: '课程分配',
+            ip: '192.168.1.90',
+            time: '2024-03-20 11:30:40',
+            status: 'success',
+            details: '为《Java程序设计》课程分配主讲教师：刘老师'
+        },
+        {
+            username: '系统管理员',
+            action: '系统维护',
+            ip: '192.168.1.10',
+            time: '2024-03-20 12:00:00',
+            status: 'warning',
+            details: '系统数据备份完成，存在 2 个警告信息'
+        },
+        {
+            username: '赵老师',
+            action: '成绩录入',
+            ip: '192.168.1.156',
+            time: '2024-03-20 14:20:35',
+            status: 'success',
+            details: '完成《数据结构》期中考试成绩录入，共 45 人'
+        },
+        {
+            username: '学生',
+            action: '教学评价',
+            ip: '192.168.1.189',
+            time: '2024-03-20 15:40:12',
+            status: 'success',
+            details: '2024春季学期教学评价提交完成，评价教师：张老师'
+        },
+        {
+            username: '未知用户',
+            action: '登录尝试',
+            ip: '10.0.0.25',
+            time: '2024-03-20 16:15:30',
+            status: 'warning',
+            details: '连续 3 次登录失败，账号临时锁定'
+        },
+        {
+            username: '管理员',
+            action: '系统配置',
+            ip: '192.168.1.5',
+            time: '2024-03-20 17:00:00',
+            status: 'success',
+            details: '更新系统选课规则配置'
+        }
+    ];
+
+    // 渲染日志列表
+    function renderLogs(logsData = logs) {
+        const logList = document.getElementById('log-list');
+        logList.innerHTML = logsData.map(log => `
+        <div class="log-card">
+            <div class="log-header">
+                <div class="log-user">
+                    <div class="log-avatar">
+                        ${log.username.charAt(0)}
+                    </div>
+                    <div>
+                        <div class="log-info">
+                            <strong>${log.username}</strong> ${log.action}
+                        </div>
+                        <div class="log-time">
+                            <i class="fas fa-clock"></i> ${log.time}
+                            <span class="log-ip"><i class="fas fa-network-wired"></i> ${log.ip}</span>
+                        </div>
+                    </div>
+                </div>
+                <span class="status-badge ${log.status === 'success' ? 'status-success' : 'status-warning'}">
+                    <i class="fas ${log.status === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    ${log.status === 'success' ? '正常' : '警告'}
+                </span>
+            </div>
+            <div class="log-content">
+                ${log.details}
+            </div>
+        </div>
+    `).join('');
+    }
+
+    // 搜索日志
+    function searchLogs() {
+        const searchText = document.querySelector('.search-box input').value.toLowerCase();
+        const filteredLogs = logs.filter(log =>
+            log.username.toLowerCase().includes(searchText) ||
+            log.action.toLowerCase().includes(searchText) ||
+            log.details.toLowerCase().includes(searchText)
+        );
+        renderLogs(filteredLogs);
+    }
+
+    // 筛选日志
+    function filterLogs() {
+        const dateFilter = document.querySelector('input[type="date"]').value;
+        const statusFilter = document.querySelector('select').value;
+
+        let filteredLogs = logs;
+
+        if (dateFilter) {
+            filteredLogs = filteredLogs.filter(log =>
+                log.time.startsWith(dateFilter)
+            );
+        }
+
+        if (statusFilter) {
+            filteredLogs = filteredLogs.filter(log =>
+                statusFilter === '1' ? log.status === 'success' : log.status === 'warning'
+            );
+        }
+
+        renderLogs(filteredLogs);
+    }
+
+    // 导出日志
+    function exportLogs() {
+        const csvContent = logs.map(log =>
+            `${log.time},${log.username},${log.action},${log.ip},${log.status},${log.details}`
+        ).join('\n');
+
+        const blob = new Blob([`时间,用户,操作,IP地址,状态,详情\n${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `系统日志_${new Date().toLocaleDateString()}.csv`;
+        link.click();
+    }
+
+    // 页面加载时渲染日志
+    document.addEventListener('DOMContentLoaded', () => {
+        renderLogs();
+    });
+</script>
 </body>
-</html> 
+
+</html>

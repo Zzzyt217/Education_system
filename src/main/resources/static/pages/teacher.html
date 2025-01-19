@@ -172,12 +172,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="teacher/grade-input.html" class="nav-link" onclick="showGradeInput()">
-                        <i class="fas fa-edit nav-icon"></i>
-                        <span>成绩录入</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="teacher/student-list.html" class="nav-link" onclick="showStudentList()">
                         <i class="fas fa-users nav-icon"></i>
                         <span>学生名单</span>
@@ -229,21 +223,6 @@
         </div>
     </div>
 
-    <!-- 搜索和筛选 -->
-    <div class="action-bar">
-        <div class="search-box">
-            <input type="text" class="form-control" placeholder="搜索教师...">
-        </div>
-        <div class="filters">
-            <select class="form-select">
-                <option value="">所有职称</option>
-                <option value="1">教授</option>
-                <option value="2">副教授</option>
-                <option value="3">讲师</option>
-                <option value="4">助教</option>
-            </select>
-        </div>
-    </div>
 
     <div id="teacher-list" class="teacher-list"></div>
 
@@ -342,114 +321,6 @@
             });
         }
 
-        function loadTeacherList() {
-            $.ajax({
-                url: '/api/teacher/all', // 后端提供的获取所有教师信息的接口
-                method: 'GET',
-                success: function(teachers) {
-                    var teacherList = $('#teacher-list');
-                    teacherList.empty();
-                    teachers.forEach(function(teacher) {
-                        var teacherCard = $('<div class="teacher-card"></div>');
-                        var teacherAvatar = $('<div class="teacher-avatar">' + teacher.username.charAt(0) + '</div>');
-                        var teacherInfo = $('<div class="teacher-info"></div>');
-                        var teacherName = $('<div class="teacher-name">' + teacher.username + '</div>');
-                        var teacherDetails = $('<div class="teacher-details"></div>');
-                        var teacherSex = $('<div class="teacher-detail"><i class="fas fa-venus-mars"></i> ' + (teacher.sex === 1? '男' : '女') + '</div>');
-                        var teacherCollege = $('<div class="teacher-detail"><i class="fas fa-university"></i> ' + teacher.college + '</div>');
-
-                        teacherDetails.append(teacherSex, teacherCollege);
-                        teacherInfo.append(teacherName, teacherDetails);
-                        teacherCard.append(teacherAvatar, teacherInfo);
-                        teacherList.append(teacherCard);
-                    });
-                },
-                error: function() {
-                    console.error('请求教师列表失败');
-                }
-            });
-        }
-
-        function showAddTeacher() {
-            $('#teacherModal').modal('show');
-        }
-
-        function saveTeacher() {
-            var formData = $('#teacherForm').serialize();
-            $.ajax({
-                url: '/api/teacher/add', // 假设后端接口为 /api/teacher/add
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        $('#teacherModal').modal('hide');
-                        alert('教师添加成功');
-                        // 重新加载统计信息
-                        loadStats();
-                        // 重新加载教师列表
-                        loadTeacherList();
-                    } else {
-                        alert('教师添加失败');
-                    }
-                },
-                error: function() {
-                    console.error('添加教师请求失败');
-                }
-            });
-        }
-
-        function showTeacherList() {
-            // 实现显示教师列表的逻辑
-            console.log('显示教师列表');
-        }
-
-        function showCourseConfirm() {
-            // 实现课程确认的逻辑
-            console.log('课程确认');
-        }
-
-        function showSchedule() {
-            // 实现课表查询的逻辑
-            console.log('课表查询');
-        }
-
-        function showGradeInput() {
-            // 实现成绩录入的逻辑
-            console.log('成绩录入');
-        }
-
-        function showStudentList() {
-            // 实现显示学生名单的逻辑
-            console.log('显示学生名单');
-        }
-
-        function editTeacher(id) {
-            // 实现编辑教师的逻辑
-            console.log('编辑教师：' + id);
-        }
-
-        function deleteTeacher(id) {
-            if (confirm('确定要删除该教师吗？')) {
-                $.ajax({
-                    url: '/api/teacher/delete/' + id, // 假设后端接口为 /api/teacher/delete/{id}
-                    method: 'DELETE',
-                    success: function(response) {
-                        if (response.success) {
-                            alert('教师删除成功');
-                            // 重新加载统计信息
-                            loadStats();
-                            // 重新加载教师列表
-                            loadTeacherList();
-                        } else {
-                            alert('教师删除失败');
-                        }
-                    },
-                    error: function() {
-                        console.error('删除教师请求失败');
-                    }
-                });
-            }
-        }
     </script>
 </body>
 </html>

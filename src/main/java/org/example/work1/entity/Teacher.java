@@ -1,22 +1,38 @@
 package org.example.work1.entity;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
+@Table(name = "teacher")
 public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "username")
     private String username;
-    private int sex;
-    private String birthday;
-    private String jobDate;
+
+    @Column(name = "sex")
+    private Integer sex;
+
+    @Column(name = "birthday")
+    private Date birthday;
+
+    @Column(name = "jobDate")
+    private Date jobDate;
+
+    @Column(name = "college")
     private String college;
+
+    @Column(name = "password")
     private String password;
+
+    @Column(name = "phone")
     private String phone;
-    private long roleId;
+
+    @Column(name = "roleId")
+    private Long roleId;
 
     // Getters and Setters
     public Long getId() {
@@ -35,26 +51,27 @@ public class Teacher {
         this.username = username;
     }
 
-    public int getSex() {
+    public Integer getSex() {
         return sex;
     }
 
-    public void setSex(int sex) {
+    public void setSex(Integer sex) {
         this.sex = sex;
     }
 
-    public String getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
-    public String getJobDate() {
+
+    public Date getJobDate() {
         return jobDate;
     }
 
-    public void setJobDate(String jobDate) {
+    public void setJobDate(Date jobDate) {
         this.jobDate = jobDate;
     }
 
@@ -82,11 +99,11 @@ public class Teacher {
         this.phone = phone;
     }
 
-    public long getRoleId() {
+    public Long getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public void setRoleId(Long roleId) {
         this.roleId = roleId;
     }
 }

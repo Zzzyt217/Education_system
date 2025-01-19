@@ -1,6 +1,7 @@
 package org.example.work1.entity;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "course")
@@ -16,7 +17,7 @@ public class Course {
     private String teacherName;
 
     @Column(name = "startdate")
-    private String startDate;
+    private Date startDate;
 
     @Column(name = "classhour")
     private Integer classHour;
@@ -28,7 +29,7 @@ public class Course {
     private String courseIntroduction;
 
     @Column(name = "coursestatus")
-    private Integer courseStatus;
+    private Integer courseStatus; // 0:待确认 1:已确认
 
     // Getters and Setters
     public Long getId() {
@@ -55,11 +56,11 @@ public class Course {
         this.teacherName = teacherName;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 

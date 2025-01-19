@@ -54,6 +54,49 @@
         .nav-item .collapsed .fa-angle-down {
             transform: rotate(-90deg);
         }
+
+        .course-list {
+            margin-top: 2rem;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            font-size: 0.875rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            padding: 1rem 1.25rem;
+        }
+
+        .table-responsive {
+            margin: -1px;
+        }
     </style>
 </head>
 <body>
@@ -114,12 +157,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="grade-input.html" class="nav-link">
-                            <i class="fas fa-edit nav-icon"></i>
-                            <span>成绩录入</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a href="student-list.html" class="nav-link">
                             <i class="fas fa-users nav-icon"></i>
                             <span>学生名单</span>
@@ -156,7 +193,7 @@
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>5</h3>
+                    <h3 id="pendingCount">0</h3>
                     <p>待确认课程</p>
                 </div>
             </div>
@@ -165,42 +202,40 @@
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>12</h3>
+                    <h3 id="confirmedCount">0</h3>
                     <p>已确认课程</p>
                 </div>
             </div>
         </div>
 
         <!-- 课程列表 -->
-        <div class="teacher-list">
-            <div class="teacher-card">
-                <div class="teacher-avatar">
-                    <i class="fas fa-book"></i>
+        <div class="course-list mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">待确认课程列表</h5>
                 </div>
-                <div class="teacher-info">
-                    <div class="teacher-name">Java程序设计</div>
-                    <div class="teacher-details">
-                        <span class="teacher-detail">
-                            <i class="fas fa-clock"></i>
-                            待确认
-                        </span>
-                        <span class="teacher-detail">
-                            <i class="fas fa-book"></i>
-                            教学大纲已上传
-                        </span>
-                        <span class="teacher-detail">
-                            <i class="fas fa-calendar"></i>
-                            2024-03-20
-                        </span>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAll" class="form-check-input">
+                                    </th>
+                                    <th>课程名称</th>
+                                    <th>教师</th>
+                                    <th>开课时间</th>
+                                    <th>课时</th>
+                                    <th>地点</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courseTableBody">
+                                <!-- 课程数据将通过JavaScript动态添加 -->
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-success btn-sm">
-                        <i class="fas fa-check"></i> 确认
-                    </button>
-                    <button class="btn btn-primary btn-sm">
-                        <i class="fas fa-eye"></i> 查看
-                    </button>
                 </div>
             </div>
         </div>
@@ -208,5 +243,146 @@
 
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // 获取课程状态统计
+    function getCourseStatusStats() {
+        $.ajax({
+            url: '/api/course/status-stats',
+            method: 'GET',
+            success: function(response) {
+                if (response.code === 200) {
+                    $('#pendingCount').text(response.pendingCourses);
+                    $('#confirmedCount').text(response.confirmedCourses);
+                } else {
+                    console.error('获取统计信息失败:', response.msg);
+                }
+            },
+            error: function(error) {
+                console.error('获取课程状态统计失败:', error);
+            }
+        });
+    }
+
+    // 加载待确认课程列表
+    function loadPendingCourses() {
+        $.ajax({
+            url: '/api/course/pending',
+            method: 'GET',
+            success: function(response) {
+                if (response.code === 200) {
+                    const tableBody = $('#courseTableBody');
+                    tableBody.empty();
+                    
+                    if (response.data && response.data.length > 0) {
+                        response.data.forEach(course => {
+                            const row = `
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="form-check-input course-checkbox" value="${course.id}">
+                                    </td>
+                                    <td>${course.courseName}</td>
+                                    <td>${course.teacherName}</td>
+                                    <td>${formatDate(course.startDate)}</td>
+                                    <td>${course.classHour}</td>
+                                    <td>${course.place}</td>
+                                    <td>
+                                        <span class="badge bg-warning">待确认</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm" onclick="confirmCourse(${course.id})">
+                                            <i class="fas fa-check"></i> 确认
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                            tableBody.append(row);
+                        });
+                    } else {
+                        tableBody.append('<tr><td colspan="8" class="text-center">暂无待确认课程</td></tr>');
+                    }
+                } else {
+                    console.error('获取课程列表失败:', response.msg);
+                    $('#courseTableBody').html('<tr><td colspan="8" class="text-center text-danger">加载失败：' + response.msg + '</td></tr>');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('获取课程列表失败:', error);
+                $('#courseTableBody').html('<tr><td colspan="8" class="text-center text-danger">加载失败，请刷新重试</td></tr>');
+            }
+        });
+    }
+
+    // 确认单个课程
+    function confirmCourse(id) {
+        $.ajax({
+            url: '/api/course/confirm/' + id,
+            method: 'PUT',
+            success: function(response) {
+                if (response.code === 200) {
+                    alert('课程确认成功');
+                    loadPendingCourses();
+                    getCourseStatusStats();
+                } else {
+                    alert('确认失败：' + response.msg);
+                }
+            },
+            error: function(error) {
+                console.error('确认失败:', error);
+                alert('确认失败，请重试');
+            }
+        });
+    }
+
+    // 批量确认课程
+    $('.btn-success').click(function() {
+        const selectedIds = [];
+        $('.course-checkbox:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+
+        if (selectedIds.length === 0) {
+            alert('请选择要确认的课程');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/course/confirm-batch',
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(selectedIds),
+            success: function(response) {
+                if (response.code === 200) {
+                    alert('批量确认成功');
+                    loadPendingCourses();
+                    getCourseStatusStats();
+                } else {
+                    alert('批量确认失败：' + response.msg);
+                }
+            },
+            error: function(error) {
+                console.error('批量确认失败:', error);
+                alert('批量确认失败，请重试');
+            }
+        });
+    });
+
+    // 全选/取消全选
+    $('#selectAll').change(function() {
+        $('.course-checkbox').prop('checked', $(this).prop('checked'));
+    });
+
+    // 格式化日期
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString();
+    }
+
+    // 页面加载时执行
+    $(document).ready(function() {
+        getCourseStatusStats();
+        loadPendingCourses();
+    });
+    </script>
 </body>
 </html> 

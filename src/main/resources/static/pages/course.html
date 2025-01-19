@@ -345,17 +345,73 @@
     </div>
 </div>
 
+<!-- 添加编辑模态框 -->
+<div class="modal fade" id="editModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑课程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="edit-id" name="id">
+                    <div class="mb-3">
+                        <label class="form-label">课程名称</label>
+                        <input type="text" class="form-control" id="edit-courseName" name="courseName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">教师姓名</label>
+                        <input type="text" class="form-control" id="edit-teacherName" name="teacherName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">开课时间</label>
+                        <input type="date" class="form-control" id="edit-startDate" name="startDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">课时</label>
+                        <input type="number" class="form-control" id="edit-classHour" name="classHour" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">上课地点</label>
+                        <input type="text" class="form-control" id="edit-place" name="place" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">课程简介</label>
+                        <textarea class="form-control" id="edit-courseIntroduction" name="courseIntroduction" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">课程状态</label>
+                        <select class="form-select" id="edit-courseStatus" name="courseStatus" required>
+                            <option value="1">正常</option>
+                            <option value="0">停课</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="updateCourse()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
 <script>
     // 获取总课程数和任课教师数的函数
     function getCourseStats() {
         $.ajax({
-            url: '/api/course-stats',
+            url: '/api/course/stats',
             method: 'GET',
             success: function(response) {
-                $('#totalCourses').text(response.totalCourses);
-                $('#totalTeachers').text(response.totalTeachers);
+                if (response.code === 200) {
+                    $('#totalCourses').text(response.totalCourses);
+                    $('#totalTeachers').text(response.totalTeachers);
+                } else {
+                    console.error('获取统计信息失败:', response.msg);
+                }
             },
             error: function(error) {
                 console.error('获取课程统计信息失败:', error);
@@ -514,6 +570,13 @@
 
     // 保存课程
     function saveCourse() {
+        // 检查表单是否填写完整
+        const form = document.getElementById('courseForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
         const formData = {
             courseName: $('input[name="courseName"]').val(),
             teacherName: $('input[name="teacherName"]').val(),
@@ -523,6 +586,8 @@
             courseIntroduction: $('textarea[name="courseIntroduction"]').val(),
             courseStatus: parseInt($('select[name="courseStatus"]').val())
         };
+
+        console.log('提交的数据:', formData);
 
         $.ajax({
             url: '/api/course/save',
@@ -540,6 +605,7 @@
                 }
             },
             error: function(xhr) {
+                console.error('保存失败:', xhr.responseText);
                 alert('保存失败：' + xhr.statusText);
             }
         });
@@ -561,6 +627,69 @@
             saveCourse();
         }
     };
+
+    // 编辑课程
+    function editCourse(id) {
+        $.ajax({
+            url: '/api/course/' + id,
+            method: 'GET',
+            success: function(response) {
+                if (response.code === 200) {
+                    const course = response.data;
+                    $('#edit-id').val(course.id);
+                    $('#edit-courseName').val(course.courseName);
+                    $('#edit-teacherName').val(course.teacherName);
+                    $('#edit-startDate').val(course.startDate);
+                    $('#edit-classHour').val(course.classHour);
+                    $('#edit-place').val(course.place);
+                    $('#edit-courseIntroduction').val(course.courseIntroduction);
+                    $('#edit-courseStatus').val(course.courseStatus);
+                    $('#editModal').modal('show');
+                } else {
+                    alert('获取课程信息失败：' + response.msg);
+                }
+            },
+            error: function(xhr) {
+                console.error('获取课程信息失败:', xhr);
+                alert('获取课程信息失败：' + xhr.statusText);
+            }
+        });
+    }
+
+    // 更新课程
+    function updateCourse() {
+        const formData = {
+            id: $('#edit-id').val(),
+            courseName: $('#edit-courseName').val(),
+            teacherName: $('#edit-teacherName').val(),
+            startDate: $('#edit-startDate').val(),
+            classHour: parseInt($('#edit-classHour').val()),
+            place: $('#edit-place').val(),
+            courseIntroduction: $('#edit-courseIntroduction').val(),
+            courseStatus: parseInt($('#edit-courseStatus').val())
+        };
+
+        $.ajax({
+            url: '/api/course/update',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                if (response.code === 200) {
+                    $('#editModal').modal('hide');
+                    loadCourses();
+                    getCourseStats();
+                    alert('修改成功');
+                } else {
+                    alert('修改失败：' + response.msg);
+                }
+            },
+            error: function(xhr) {
+                console.error('修改失败:', xhr);
+                alert('修改失败：' + xhr.statusText);
+            }
+        });
+    }
 </script>
 </body>
 </html>

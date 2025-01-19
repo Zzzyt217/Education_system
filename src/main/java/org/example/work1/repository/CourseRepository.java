@@ -4,9 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.example.work1.entity.Course;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("SELECT COUNT(c) FROM Course c")
     Long countAllCourses();
@@ -20,4 +22,16 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     // 添加搜索方法
     @Query("SELECT c FROM Course c WHERE c.courseName LIKE %:keyword% OR c.teacherName LIKE %:keyword%")
     List<Course> searchCourses(@Param("keyword") String keyword);
+
+    // 使用JPQL查询待确认课程
+    @Query("SELECT c FROM Course c WHERE c.courseStatus = 0")
+    List<Course> findPendingCourses();
+
+    // 使用JPQL查询已确认课程
+    @Query("SELECT c FROM Course c WHERE c.courseStatus = 1")
+    List<Course> findConfirmedCourses();
+
+    // 使用JPQL统计不同状态的课程数量
+    @Query("SELECT COUNT(c) FROM Course c WHERE c.courseStatus = :status")
+    long countByCourseStatus(@Param("status") Integer status);
 }

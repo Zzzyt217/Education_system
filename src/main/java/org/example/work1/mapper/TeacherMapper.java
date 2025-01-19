@@ -23,11 +23,24 @@ public interface TeacherMapper {
     @Select("SELECT * FROM teacher")
     List<Teacher> findAllTeachers();
 
+    @Select("SELECT * FROM teacher WHERE username LIKE CONCAT('%',#{keyword},'%') " +
+            "OR phone LIKE CONCAT('%',#{keyword},'%') " +
+            "OR college LIKE CONCAT('%',#{keyword},'%')")
+    List<Teacher> searchTeachers(@Param("keyword") String keyword);
+
     // 新增方法：修改教师信息
-    @Update("UPDATE teacher SET username = #{username}, sex = #{sex}, birthday = #{birthday}, jobDate = #{jobDate}, college = #{college}, password = #{password}, phone = #{phone}, roleId = #{roleId} WHERE id = #{id}")
+    @Update("UPDATE teacher SET username = #{username}, sex = #{sex}, birthday = #{birthday}, jobDate = #{jobDate}, college = #{college}, phone = #{phone}, roleId = #{roleId} WHERE id = #{id}")
     int updateTeacher(Teacher teacher);
 
     // 新增方法：删除教师信息
     @Delete("DELETE FROM teacher WHERE id = #{id}")
-    int deleteTeacher(Long id);
+    int deleteTeacher(@Param("id") Long id);
+
+    @Select("SELECT * FROM teacher WHERE id = #{id}")
+    Teacher findById(@Param("id") Long id);
+
+    @Insert("INSERT INTO teacher(username, sex, birthday, jobDate, college, phone, roleId, password) " +
+            "VALUES(#{username}, #{sex}, #{birthday}, #{jobDate}, #{college}, #{phone}, #{roleId}, #{password})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insertTeacher(Teacher teacher);
 }
