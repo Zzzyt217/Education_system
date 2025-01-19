@@ -225,22 +225,7 @@
         </div>
     </div>
 
-    <!-- 保持搜索框HTML结构不变 -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-10">
-                    <input type="text" class="form-control" id="searchKeyword" 
-                           placeholder="请输入学生姓名、手机号、班级或学院...">
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary w-100" id="searchBtn">
-                        <i class="fas fa-search"></i> 搜索
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -248,7 +233,7 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 <script src="../js/student.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         fetch('/students/stats')
             .then(response => response.json())
             .then(data => {
@@ -256,7 +241,7 @@
                 document.getElementById('maleStudents').textContent = data.male;
                 document.getElementById('femaleStudents').textContent = data.female;
 
-                // 绘制性别比例饼状图
+                // Gender Chart
                 const genderCtx = document.getElementById('genderChart').getContext('2d');
                 new Chart(genderCtx, {
                     type: 'pie',
@@ -278,12 +263,50 @@
                         }
                     }
                 });
+
+                // College Distribution Chart
+                const collegeData = data.collegeDistribution;
+                const collegeLabels = Object.keys(collegeData);
+                const collegeCounts = Object.values(collegeData);
+                const collegeCtx = document.getElementById('majorChart').getContext('2d');
+                new Chart(collegeCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: collegeLabels,
+                        datasets: [{
+                            data: collegeCounts,
+                            backgroundColor: [
+                                'rgba(52,152,219,0.2)', // 蓝色
+                                'rgba(155,89,182,0.2)', // 紫色
+                                'rgba(46,204,113,0.2)', // 绿色
+                                'rgba(241,196,15,0.2)', // 黄色
+                                'rgba(231,76,60,0.2)'   // 红色
+                            ],
+                            borderColor: [
+                                'rgba(52,152,219,1)',   // 蓝色边框
+                                'rgba(155,89,182,1)',   // 紫色边框
+                                'rgba(46,204,113,1)',   // 绿色边框
+                                'rgba(241,196,15,1)',   // 黄色边框
+                                'rgba(231,76,60,1)'     // 红色边框
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+
             })
             .catch(error => {
                 console.error('Error fetching student stats:', error);
             });
     });
-
 
 </script>
 </body>

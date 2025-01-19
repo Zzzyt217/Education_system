@@ -1,12 +1,11 @@
 package org.example.work1.controller;
 
-import org.example.work1.entity.Student;
+import org.example.work1.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.example.work1.service.StudentService;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 public class StudentController {
@@ -19,14 +18,9 @@ public class StudentController {
         long total = studentService.getTotalStudentCount();
         long male = studentService.getMaleStudentCount();
         long female = studentService.getFemaleStudentCount();
-        double maleRatio = total == 0? 0 : (double) male / total;
-        double femaleRatio = total == 0? 0 : (double) female / total;
+        Map<String, Long> collegeDistribution = studentService.getCollegeDistribution();
 
-        return new StudentStats(total, male, female, maleRatio, femaleRatio);
-    }
-    @GetMapping("/students")
-    public List<Student> getStudents() {
-        return studentService.getAllStudents();
+        return new StudentStats(total, male, female, collegeDistribution);
     }
 }
 
@@ -34,15 +28,13 @@ class StudentStats {
     private long total;
     private long male;
     private long female;
-    private double maleRatio;
-    private double femaleRatio;
+    private Map<String, Long> collegeDistribution;
 
-    public StudentStats(long total, long male, long female, double maleRatio, double femaleRatio) {
+    public StudentStats(long total, long male, long female, Map<String, Long> collegeDistribution) {
         this.total = total;
         this.male = male;
         this.female = female;
-        this.maleRatio = maleRatio;
-        this.femaleRatio = femaleRatio;
+        this.collegeDistribution = collegeDistribution;
     }
 
     public long getTotal() {
@@ -57,11 +49,7 @@ class StudentStats {
         return female;
     }
 
-    public double getMaleRatio() {
-        return maleRatio;
-    }
-
-    public double getFemaleRatio() {
-        return femaleRatio;
+    public Map<String, Long> getCollegeDistribution() {
+        return collegeDistribution;
     }
 }
