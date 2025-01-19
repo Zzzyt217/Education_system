@@ -3,59 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <title>学生名单</title>
+    <!-- 1. 首先加载jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 2. 然后加载Bootstrap JS -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <!-- 3. 最后加载CSS -->
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="../../css/common.css" rel="stylesheet">
     <link href="../../css/layout.css" rel="stylesheet">
-</head>
-<style>
-    .logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin-right: 10px;
-    }
+    
+    <!-- 4. 自定义JavaScript代码 -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            loadCourses();
+            
+            // 监听课程选择变化
+            $('#courseSelect').change(function() {
+                const selectedCourse = $(this).val();
+                console.log('选中的课程:', selectedCourse);
+                loadStudents(selectedCourse);
+            });
+        });
 
-    .sidebar-header {
-        display: flex;
-        align-items: center;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.075);
-    }
+        // 加载课程列表
+        function loadCourses() {
+            $.ajax({
+                url: '/api/course/list',
+                method: 'GET',
+                success: function(response) {
+                    console.log('课程列表响应:', response);
+                    if (response.code === 200) {
+                        const select = $('#courseSelect');
+                        select.empty().append('<option value="">选择课程</option>');
+                        response.data.forEach(course => {
+                            select.append(`<option value="${course.courseName}">${course.courseName}</option>`);
+                        });
+                    } else {
+                        console.error('获取课程列表失败:', response.msg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('获取课程列表失败:', error);
+                    console.error('状态:', status);
+                    console.error('响应:', xhr.responseText);
+                }
+            });
+        }
 
-    .sidebar-header h3 {
-        margin: 0;
-        color: white;
-        font-size: 1.5rem;
-    }
+        // 加载学生名单
+        function loadStudents(courseName) {
+            if (!courseName) {
+                $('#studentTableBody').empty();
+                return;
+            }
 
-    .nav-submenu {
-        padding-left: 20px;
-        list-style: none;
-        background: rgba(255, 255, 255, 0.05);
-    }
+            console.log('正在加载课程的学生名单:', courseName);
+            const tableBody = $('#studentTableBody');
+            
+            // 添加加载提示
+            tableBody.html('<tr><td colspan="4" class="text-center">正在加载...</td></tr>');
+            
+            $.ajax({
+                url: `/api/sc/students/${courseName}`,
+                method: 'GET',
+                success: function(response) {
+                    console.log('学生名单响应:', response);
+                    tableBody.empty();
 
-    .nav-submenu .nav-link {
-        padding: 8px 15px;
-        font-size: 14px;
-    }
+                    if (response.code === 200) {
+                        if (response.data && response.data.length > 0) {
+                            response.data.forEach((student, index) => {
+                                const row = `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${student.username || '-'}</td>
+                                        <td>${student.className || '-'}</td>
+                                        <td>${student.phone || '-'}</td>
+                                    </tr>
+                                `;
+                                tableBody.append(row);
+                            });
+                        } else {
+                            tableBody.html('<tr><td colspan="4" class="text-center">该课程暂无学生选课</td></tr>');
+                        }
+                    } else {
+                        console.error('获取学生名单失败:', response.msg);
+                        tableBody.html(`<tr><td colspan="4" class="text-center text-danger">获取学生名单失败：${response.msg}</td></tr>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('获取学生名单失败:', error);
+                    console.error('状态:', status);
+                    console.error('响应:', xhr.responseText);
+                    tableBody.html('<tr><td colspan="4" class="text-center text-danger">获取学生名单失败，请刷新重试</td></tr>');
+                }
+            });
+        }
 
-    .nav-submenu .nav-icon {
-        font-size: 14px;
-        width: 20px;
-        margin-right: 5px;
-    }
+        // 导出Excel
+        function exportToExcel() {
+            const courseName = $('#courseSelect').val();
+            if (!courseName) {
+                alert('请先选择课程');
+                return;
+            }
+            window.location.href = `/api/sc/export/${courseName}`;
+        }
+    </script>
 
-    .nav-item .fa-angle-down {
-        float: right;
-        margin-top: 5px;
-        transition: transform 0.3s;
-    }
+    <style>
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
 
-    .nav-item .collapsed .fa-angle-down {
-        transform: rotate(-90deg);
-    }
-</style>
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.075);
+        }
+
+        .sidebar-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .nav-submenu {
+            padding-left: 20px;
+            list-style: none;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-submenu .nav-link {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .nav-submenu .nav-icon {
+            font-size: 14px;
+            width: 20px;
+            margin-right: 5px;
+        }
+
+        .nav-item .fa-angle-down {
+            float: right;
+            margin-top: 5px;
+            transition: transform 0.3s;
+        }
+
+        .nav-item .collapsed .fa-angle-down {
+            transform: rotate(-90deg);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .form-select {
+            width: 200px;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+            border: none;
+            border-radius: 0.5rem;
+        }
+    </style>
 </head>
 <body>
 <!-- 复用原有的导航栏代码 -->
@@ -137,46 +261,32 @@
                 学生名单
             </h1>
             <div class="header-actions">
-                <button class="btn btn-success">
+                <select class="form-select" id="courseSelect">
+                    <option value="">选择课程</option>
+                </select>
+                <button class="btn btn-success ms-2" onclick="exportToExcel()">
                     <i class="fas fa-file-excel"></i> 导出Excel
                 </button>
             </div>
         </div>
 
-        <!-- 筛选条件 -->
-        <div class="action-bar">
-            <div class="search-box">
-                <select class="form-select">
-                    <option>Java程序设计</option>
-                    <option>数据结构</option>
-                    <!-- 更多课程选项 -->
-                </select>
-            </div>
-        </div>
-
         <!-- 学生列表 -->
-        <div class="teacher-list">
-            <!-- 使用相同的卡片样式显示学生信息 -->
-            <div class="teacher-card">
-                <div class="teacher-avatar">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <div class="teacher-info">
-                    <div class="teacher-name">李四</div>
-                    <div class="teacher-details">
-                        <span class="teacher-detail">
-                            <i class="fas fa-id-card"></i>
-                            2021001
-                        </span>
-                        <span class="teacher-detail">
-                            <i class="fas fa-users"></i>
-                            计算机科学2班
-                        </span>
-                        <span class="teacher-detail">
-                            <i class="fas fa-phone"></i>
-                            13900139000
-                        </span>
-                    </div>
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>姓名</th>
+                                <th>班级</th>
+                                <th>联系电话</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <!-- 学生数据将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -55,6 +55,51 @@
             transform: rotate(-90deg);
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            loadSchedule();
+        });
+
+        function loadSchedule() {
+            const tableBody = $('#scheduleTableBody');
+            tableBody.html('<tr><td colspan="4" class="text-center">正在加载...</td></tr>');
+            
+            $.ajax({
+                url: '/api/sc/schedule',
+                method: 'GET',
+                success: function(response) {
+                    console.log('获取课表响应:', response);
+                    tableBody.empty();
+                    
+                    if (response.code === 200) {
+                        if (response.data && response.data.length > 0) {
+                            response.data.forEach((item, index) => {
+                                const row = `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.courseName || '-'}</td>
+                                        <td>${item.courseTime || '-'}</td>
+                                        <td>${item.classLocation || '-'}</td>
+                                    </tr>
+                                `;
+                                tableBody.append(row);
+                            });
+                        } else {
+                            tableBody.html('<tr><td colspan="4" class="text-center">暂无课程安排</td></tr>');
+                        }
+                    } else {
+                        console.error('获取课表失败:', response.msg);
+                        tableBody.html(`<tr><td colspan="4" class="text-center text-danger">获取课表失败：${response.msg}</td></tr>`);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('获取课表失败:', error);
+                    tableBody.html('<tr><td colspan="4" class="text-center text-danger">获取课表失败，请刷新重试</td></tr>');
+                }
+            });
+        }
+    </script>
 </head>
 <body>
     <!-- 复用原有的导航栏代码 -->
@@ -146,25 +191,23 @@
         </div>
 
         <!-- 课表网格 -->
-        <div class="teacher-list">
-            <!-- 使用相同的卡片样式显示课表 -->
-            <div class="row">
-                <div class="col">
-                    <div class="teacher-card">
-                        <h5>周一</h5>
-                        <div class="teacher-details">
-                            <span class="teacher-detail">
-                                <i class="fas fa-clock"></i>
-                                8:00-9:40
-                            </span>
-                            <span class="teacher-detail">
-                                <i class="fas fa-map-marker-alt"></i>
-                                A-301
-                            </span>
-                        </div>
-                    </div>
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>课程名称</th>
+                                <th>上课时间</th>
+                                <th>上课地点</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTableBody">
+                            <!-- 课表数据将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
                 </div>
-                <!-- 其他天的课表 -->
             </div>
         </div>
     </div>

@@ -83,6 +83,7 @@ public class CourseController {
             result.put("msg", "success");
             result.put("data", courses);
         } catch (Exception e) {
+            e.printStackTrace();
             result.put("code", 500);
             result.put("msg", "获取课程列表失败");
         }
