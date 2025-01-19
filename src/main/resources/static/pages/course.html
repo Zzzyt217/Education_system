@@ -104,6 +104,71 @@
             color: white;
             font-size: 1.5rem;
         }
+
+        .action-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 0 0 400px;
+        }
+
+        .search-box .input-group {
+            width: 100%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .search-box .input-group-text {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-right: none;
+            padding-left: 20px;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+        }
+
+        .search-box .form-control {
+            border: 1px solid #e0e0e0;
+            border-left: none;
+            padding-left: 0;
+            font-size: 14px;
+        }
+
+        .search-box .form-control:focus {
+            border-color: #e0e0e0;
+            box-shadow: none;
+        }
+
+        .search-box .btn-primary {
+            border-top-right-radius: 50px;
+            border-bottom-right-radius: 50px;
+            padding-left: 20px;
+            padding-right: 20px;
+            background-color: var(--primary-color);
+            border: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-box .btn-primary:hover {
+            background-color: var(--primary-dark-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-box .input-group-text i {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .search-box .input-group:hover {
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body>
@@ -173,7 +238,7 @@
                 <i class="fas fa-book"></i>
             </div>
             <div class="stat-info">
-                <h3 id="totalCourses">86</h3>
+                <h3 id="totalCourses"></h3>
                 <p>总课程数</p>
             </div>
         </div>
@@ -182,7 +247,7 @@
                 <i class="fas fa-chalkboard-teacher"></i>
             </div>
             <div class="stat-info">
-                <h3 id="totalTeachers">32</h3>
+                <h3 id="totalTeachers"></h3>
                 <p>任课教师</p>
             </div>
         </div>
@@ -191,58 +256,21 @@
     <!-- 搜索和筛选 -->
     <div class="action-bar">
         <div class="search-box">
-            <input type="text" class="form-control" placeholder="搜索课程...">
-        </div>
-        <div class="filters">
-            <select class="form-select me-2">
-                <option value="">所有类型</option>
-                <option value="required">必修课</option>
-                <option value="optional">选修课</option>
-            </select>
-            <select class="form-select">
-                <option value="">所有学分</option>
-                <option value="2">2学分</option>
-                <option value="3">3学分</option>
-                <option value="4">4学分</option>
-            </select>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchInput" placeholder="搜索课程名或教师名...">
+                <button class="btn btn-primary" type="button" onclick="searchCourses()">
+                    <i class="fas fa-search me-1"></i>搜索
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- 课程列表 -->
-    <div class="course-list">
-        <!-- 课程卡片示例 -->
-        <div class="course-card">
-            <div class="course-icon">
-                <i class="fas fa-book"></i>
-            </div>
-            <div class="course-info">
-                <div class="course-name">Java程序设计</div>
-                <div class="course-details">
-                    <span class="type-badge type-required">必修</span>
-                    <span class="credit-badge">4学分</span>
-                    <span class="course-detail">
-                                <i class="fas fa-user"></i>
-                                张三
-                            </span>
-                    <span class="course-detail">
-                                <i class="fas fa-clock"></i>
-                                64学时
-                            </span>
-                    <span class="course-detail">
-                                <i class="fas fa-map-marker-alt"></i>
-                                教学楼A-301
-                            </span>
-                </div>
-            </div>
-            <div class="action-buttons">
-                <button class="btn btn-primary btn-sm" onclick="editCourse(1)">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="deleteCourse(1)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
+    <div class="course-list" id="courseList">
+        <!-- 课程数据将通过JavaScript动态加载 -->
     </div>
 </div>
 </div>
@@ -259,21 +287,19 @@
                 <form id="courseForm">
                     <div class="mb-3">
                         <label class="form-label">课程名称</label>
-                        <input type="text" class="form-control" name="courseName" required minlength="2" maxlength="50">
+                        <input type="text" class="form-control" name="courseName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">教师姓名</label>
+                        <input type="text" class="form-control" name="teacherName" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">开课时间</label>
                         <input type="date" class="form-control" name="startDate" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">授课教师</label>
-                        <select class="form-control" name="teacherId" required>
-                            <!-- 教师选项将通过JavaScript动态加载 -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label">课时</label>
-                        <input type="number" class="form-control" name="hours" required min="1" max="200">
+                        <input type="number" class="form-control" name="classHour" required min="1">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">上课地点</label>
@@ -281,25 +307,14 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">课程简介</label>
-                        <textarea class="form-control" name="description" rows="3"></textarea>
+                        <textarea class="form-control" name="courseIntroduction" rows="3"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">课程状态</label>
-                        <select class="form-control" name="status" required>
+                        <select class="form-control" name="courseStatus" required>
                             <option value="1">正常</option>
                             <option value="0">停课</option>
                         </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">课程类型</label>
-                        <select class="form-control" name="type" required>
-                            <option value="required">必修</option>
-                            <option value="optional">选修</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">学分</label>
-                        <input type="number" class="form-control" name="credit" required min="0.5" max="10" step="0.5">
                     </div>
                 </form>
             </div>
@@ -339,7 +354,6 @@
             url: '/api/course-stats',
             method: 'GET',
             success: function(response) {
-                // 更新页面上的总课程数和任课教师数
                 $('#totalCourses').text(response.totalCourses);
                 $('#totalTeachers').text(response.totalTeachers);
             },
@@ -349,10 +363,204 @@
         });
     }
 
-    // 页面加载完成后调用获取统计信息的函数
+    // 获取课程列表数据
+    function loadCourses() {
+        $.ajax({
+            url: '/api/course/list',
+            method: 'GET',
+            success: function(response) {
+                if (response.code === 200) {
+                    displayCourses(response.data);
+                } else {
+                    alert('获取课程列表失败：' + response.msg);
+                }
+            },
+            error: function(xhr) {
+                alert('获取课程列表失败：' + xhr.statusText);
+            }
+        });
+    }
+
+    // 显示课程列表
+    function displayCourses(courses) {
+        const courseList = $('#courseList');
+        courseList.empty();
+        
+        courses.forEach(course => {
+            const statusText = course.courseStatus === 1 ? '正常' : '停课';
+            const statusClass = course.courseStatus === 1 ? 'text-success' : 'text-danger';
+            
+            const courseHtml = `
+                <div class="course-card">
+                    <div class="course-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="course-info">
+                        <div class="course-name">${course.courseName}</div>
+                        <div class="course-details">
+                            <span class="course-detail">
+                                <i class="fas fa-clock"></i>
+                                ${course.classHour}学时
+                            </span>
+                            <span class="course-detail">
+                                <i class="fas fa-user"></i>
+                                ${course.teacherName}
+                            </span>
+                            <span class="course-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${course.place}
+                            </span>
+                            <span class="course-detail ${statusClass}">
+                                <i class="fas fa-circle"></i>
+                                ${statusText}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-sm me-2" onclick="editCourse(${course.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCourse(${course.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            courseList.append(courseHtml);
+        });
+    }
+
+    // 删除课程
+    function deleteCourse(id) {
+        if (confirm('确定要删除这门课程吗？此操作不可恢复。')) {
+            $.ajax({
+                url: '/api/course/delete/' + id,
+                method: 'DELETE',
+                success: function(response) {
+                    if (response.code === 200) {
+                        alert('删除成功');
+                        loadCourses(); // 重新加载课程列表
+                        getCourseStats(); // 更新统计数据
+                    } else {
+                        alert('删除失败：' + response.msg);
+                    }
+                },
+                error: function(xhr) {
+                    alert('删除失败：' + xhr.statusText);
+                }
+            });
+        }
+    }
+
+    // 页面加载完成后执行
     $(document).ready(function() {
         getCourseStats();
+        loadCourses(); // 加载课程列表
     });
+
+    // 修改搜索功能
+    function searchCourses() {
+        const keyword = $('#searchInput').val().trim();
+        if (keyword === '') {
+            loadCourses(); // 如果搜索框为空，加载所有课程
+            return;
+        }
+        
+        $.ajax({
+            url: '/api/course/search',
+            method: 'GET',
+            data: { keyword: keyword },
+            success: function(response) {
+                if (response.code === 200) {
+                    displayCourses(response.data);
+                } else {
+                    alert('搜索失败：' + response.msg);
+                }
+            },
+            error: function(xhr) {
+                alert('搜索失败：' + xhr.statusText);
+            }
+        });
+    }
+
+    // 修改输入框事件，支持回车搜索
+    $('#searchInput').on('keypress', function(e) {
+        if (e.which === 13) { // 回车键
+            searchCourses();
+        }
+    });
+
+    // 保留原有的输入防抖功能
+    let searchTimeout;
+    $('#searchInput').on('input', function() {
+        clearTimeout(searchTimeout);
+        const keyword = $(this).val().trim();
+        
+        searchTimeout = setTimeout(() => {
+            if (keyword === '') {
+                loadCourses();
+                return;
+            }
+            searchCourses();
+        }, 300);
+    });
+
+    // 显示添加课程模态框
+    function showAddCourse() {
+        $('#courseForm')[0].reset(); // 重置表单
+        $('#courseModalLabel').text('添加课程');
+        $('#courseModal').modal('show');
+    }
+
+    // 保存课程
+    function saveCourse() {
+        const formData = {
+            courseName: $('input[name="courseName"]').val(),
+            teacherName: $('input[name="teacherName"]').val(),
+            startDate: $('input[name="startDate"]').val(),
+            classHour: parseInt($('input[name="classHour"]').val()),
+            place: $('input[name="place"]').val(),
+            courseIntroduction: $('textarea[name="courseIntroduction"]').val(),
+            courseStatus: parseInt($('select[name="courseStatus"]').val())
+        };
+
+        $.ajax({
+            url: '/api/course/save',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                if (response.code === 200) {
+                    alert('保存成功');
+                    $('#courseModal').modal('hide');
+                    loadCourses(); // 重新加载课程列表
+                    getCourseStats(); // 更新统计数据
+                } else {
+                    alert('保存失败：' + response.msg);
+                }
+            },
+            error: function(xhr) {
+                alert('保存失败：' + xhr.statusText);
+            }
+        });
+    }
+
+    // 表单验证
+    function validateCourseForm() {
+        const form = document.getElementById('courseForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return false;
+        }
+        return true;
+    }
+
+    // 修改保存按钮的点击事件
+    document.querySelector('#courseModal .btn-primary').onclick = function() {
+        if (validateCourseForm()) {
+            saveCourse();
+        }
+    };
 </script>
 </body>
 </html>
