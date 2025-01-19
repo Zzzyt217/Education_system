@@ -12,8 +12,6 @@ public class Teacher {
     private String username;
     private int sex;
     private String birthday;
-    private int grade;
-    private int rank;
     private String jobDate;
     private String college;
     private String password;
@@ -52,23 +50,6 @@ public class Teacher {
     public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
-
-    public int getGrade() {
-        return grade;
-    }
-
-    public void setGrade(int grade) {
-        this.grade = grade;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
     public String getJobDate() {
         return jobDate;
     }
