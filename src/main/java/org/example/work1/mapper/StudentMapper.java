@@ -38,7 +38,7 @@ public interface StudentMapper {
             "ORDER BY college ASC, classname ASC, username ASC" +
             "</script>")
     @Results({
-        @Result(property = "className", column = "classname")
+            @Result(property = "className", column = "classname")
     })
     List<Student> searchStudents(@Param("keyword") String keyword);
 
@@ -56,7 +56,7 @@ public interface StudentMapper {
             "address = #{address} " +
             "WHERE username = #{username}")
     @Results({
-        @Result(property = "className", column = "classname")
+            @Result(property = "className", column = "classname")
     })
     int updateStudent(Student student);
 }
