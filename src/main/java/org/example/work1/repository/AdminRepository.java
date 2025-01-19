@@ -11,4 +11,6 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
 
     @Query("SELECT a FROM Admin a WHERE a.username LIKE CONCAT('%',?1,'%') OR a.phone LIKE CONCAT('%',?1,'%') OR a.nickname LIKE CONCAT('%',?1,'%')")
     List<Admin> searchAdmins(String keyword);
+
+    Admin findByUsernameAndUserpass(String username, String userpass);
 }

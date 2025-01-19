@@ -4,4 +4,5 @@ import org.example.work1.entity.Student;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
     long countBySex(int sex);
+    Student findByUsernameAndUserpass(String username, String userpass);
 }

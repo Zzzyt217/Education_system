@@ -168,13 +168,13 @@
             <ul class="collapse show nav-submenu" id="teacherSubmenu">
                 <li class="nav-item">
                     <a href="studentlist.html" class="nav-link active">
-                        <i class="fas fa-check-circle nav-icon"></i>
+                        <i class="fas fa-list-ul nav-icon"></i>
                         <span>学生列表</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="student-info.html" class="nav-link">
-                        <i class="fas fa-calendar-alt nav-icon"></i>
+                        <i class="fas fa-user-edit nav-icon"></i>
                         <span>信息修改</span>
                     </a>
                 </li>
@@ -327,7 +327,7 @@
     // 页面加载时获取学生列表
     document.addEventListener('DOMContentLoaded', function() {
         loadStudents();
-        
+
         // 绑定搜索按钮点击事件
         document.getElementById('searchBtn').addEventListener('click', function() {
             const keyword = document.getElementById('searchKeyword').value;
@@ -335,7 +335,7 @@
 
             const params = new URLSearchParams();
             if (keyword) params.append('keyword', keyword);
-            
+
             const url = `/api/students/search?${params.toString()}`;
             console.log('请求URL:', url);
 
@@ -351,7 +351,7 @@
                     console.log('搜索结果:', students);
                     const tbody = document.querySelector('#studentTable tbody');
                     tbody.innerHTML = '';
-                    
+
                     if (students.length === 0) {
                         console.log('没有找到匹配的学生');
                         tbody.innerHTML = '<tr><td colspan="8" class="text-center">没有找到匹配的学生</td></tr>';
@@ -451,6 +451,14 @@
                 alert('系统错误，请重试');
             }
         });
+
+        // 修改回车搜索支持
+        $('#searchKeyword').on('keypress', function(e) {
+            if (e.which === 13) { // 回车键
+                e.preventDefault(); // 阻止默认的回车行为
+                $('#searchBtn').click(); // 触发搜索按钮点击
+            }
+        });
     });
 
     // 加载学生列表
@@ -460,7 +468,7 @@
             .then(students => {
                 const tbody = document.querySelector('#studentTable tbody');
                 tbody.innerHTML = '';
-                
+
                 students.forEach(student => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -496,7 +504,7 @@
         if (confirm('确定要删除这名学生吗？此操作不可恢复。')) {
             // 打印id值，用于调试
             console.log('Deleting student with id:', id);
-            
+
             fetch(`/api/students/${id}`, {
                 method: 'DELETE',
                 headers: {

@@ -156,6 +156,71 @@
         .card .btn-primary:hover {
             background-color: var(--primary-dark-color);
         }
+
+
+        .user-profile {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            display: block;
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .user-role {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+
+        .user-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-actions .btn-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 5px;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .user-actions .btn-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 
@@ -368,6 +433,30 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"></script>
 
 <script>
+    // 退出登录
+    function logout() {
+        if (confirm('确定要退出登录吗？')) {
+            // 这里可以添加退出登录的API调用
+            window.location.href = '/login.html';
+        }
+    }
+
+    // 修改密码
+    function changePassword() {
+        const oldPassword = $('#oldPassword').val();
+        const newPassword = $('#newPassword').val();
+        const confirmPassword = $('#confirmPassword').val();
+
+        if (newPassword !== confirmPassword) {
+            alert('两次输入的新密码不一致');
+            return;
+        }
+
+        // 这里可以添加修改密码的API调用
+        alert('密码修改成功！');
+        $('#changePasswordModal').modal('hide');
+        $('#changePasswordForm')[0].reset();
+    }
     // 显示添加管理员模态框
     function showAddAdmin() {
         $('#addAdminModal').modal('show');
@@ -383,7 +472,7 @@
             var table = $("table");
             table.append("<thead><tr><th>ID</th><th>用户名</th><th>昵称</th><th>角色</th><th>性别</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody>");
             $.each(data, function (index, admin) {
-                table.append("<tr><td>" + admin.id + "</td><td>" + admin.username + "</td><td>" + admin.nickname + "</td><td>" + admin.roleName + "</td><td>" + admin.sex + "</td><td>" + admin.phone + "</td><td>" + admin.email + "</td><td><button class='btn btn-primary btn-sm editAdmin' data-id='" + admin.id + "'>修改</button><button class='btn btn-danger btn-sm deleteAdmin' data-id='" + admin.id + "'>删除</button></td></tr>");
+                table.append("<tr><td>" + admin.id + "</td><td>" + admin.username + "</td><td>" + admin.nickname + "</td><td>" + admin.roleName + "</td><td>" + admin.sex + "</td><td>" + admin.phone + "</td><td>" + admin.email + "</td><td><button class='btn btn-primary btn-sm editAdmin' data-id='" + admin.id + "'> <i class=\"fas fa-edit\"></i>  </button> <button class='btn btn-danger btn-sm deleteAdmin' data-id='" + admin.id + "'> <i class=\"fas fa-trash\"></i> </button></td></tr>");
             });
             table.append("</tbody>");
         });

@@ -1,35 +1,44 @@
 package org.example.work1.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "admin_info")
+@Table(name = "admin_info")  // 指定表名
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
+
+    @Column(name = "username", length = 50)
     private String username;
+
+    @Column(name = "userpass", length = 50)
     private String userpass;
+
+    @Column(name = "nickname", length = 50)
     private String nickname;
 
-    @Column(name = "role_id") // 修改为与数据库中修改后的列名一致
-    private long roleId;
+    @Column(name = "role_id")
+    private Long roleId;
+
+    @Column(name = "role_name", length = 32)
     private String roleName;
+
+    @Column(name = "sex", length = 50)
     private String sex;
+
+    @Column(name = "phone", length = 50)
     private String phone;
+
+    @Column(name = "email", length = 50)
     private String email;
 
     // Getters and Setters
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -57,11 +66,11 @@ public class Admin {
         this.nickname = nickname;
     }
 
-    public long getRoleId() {
+    public Long getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(long roleId) {
+    public void setRoleId(Long roleId) {
         this.roleId = roleId;
     }
 

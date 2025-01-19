@@ -233,6 +233,70 @@
             color: white;
             font-size: 1.5rem;
         }
+
+        .user-profile {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            display: block;
+            color: white;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .user-role {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+
+        .user-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-actions .btn-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 5px;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .user-actions .btn-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -279,11 +343,67 @@
             </a>
         </li>
     </ul>
+
+    <div class="user-profile">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-details">
+                <span class="user-name"></span>
+                <span class="user-role"></span>
+            </div>
+        </div>
+        <div class="user-actions">
+            <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <i class="fas fa-key"></i> 修改密码
+            </button>
+            <button class="btn btn-link" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> 退出登录
+            </button>
+        </div>
+    </div>
 </nav>
+
+<div class="modal fade" id="changePasswordModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">修改密码</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="mb-3">
+                        <label class="form-label">原密码</label>
+                        <input type="password" class="form-control" id="oldPassword" required 
+                               minlength="6" maxlength="20">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">新密码</label>
+                        <input type="password" class="form-control" id="newPassword" required 
+                               minlength="6" maxlength="20">
+                        <div class="form-text">密码长度需要在6-20位之间</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">确认新密码</label>
+                        <input type="password" class="form-control" id="confirmPassword" required 
+                               minlength="6" maxlength="20">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="changePassword()">确认修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="main-content">
     <!-- 欢迎区域 -->
     <div class="welcome-section">
-        <h1 class="welcome-title">欢迎回来，管理员</h1>
+        <h1 class="welcome-title">欢迎回来，</h1>
         <p class="welcome-subtitle">今天是 <span id="currentDate"></span></p>
     </div>
 
@@ -378,6 +498,9 @@
     </div>
 </div>
 
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+
 <script>
     // 设置当前日期
     document.getElementById('currentDate').textContent =
@@ -401,6 +524,80 @@
                 console.error('Error fetching stats:', error);
             });
     });
+
+    // 在页面加载时获取当前用户信息
+    $(document).ready(function() {
+        // 从localStorage获取用户信息
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser) {
+            $('.user-name').text(currentUser.nickname || currentUser.username);
+            $('.user-role').text(currentUser.roleId === 2 ? '管理员' : '教师');
+            // 设置欢迎语句
+            $('.welcome-title').text('欢迎回来，' + (currentUser.roleId === 2 ? '管理员' : '教师'));
+        } else {
+            // 如果没有用户信息，重定向到登录页
+            window.location.href = '/login.html';
+        }
+    });
+
+    // 修改密码
+    function changePassword() {
+        const oldPassword = $('#oldPassword').val();
+        const newPassword = $('#newPassword').val();
+        const confirmPassword = $('#confirmPassword').val();
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            alert('请填写所有密码字段');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert('两次输入的新密码不一致');
+            return;
+        }
+
+        // 从localStorage获取当前用户信息
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            alert('用户信息已失效，请重新登录');
+            window.location.href = '/login.html';
+            return;
+        }
+
+        // 根据用户角色选择不同的API
+        const apiUrl = currentUser.roleId === 2 ? '/api/admin/password' : '/api/teacher/password';
+
+        $.ajax({
+            url: apiUrl,
+            method: 'PUT',
+            data: {
+                username: currentUser.username,
+                oldPassword: oldPassword,
+                newPassword: newPassword
+            },
+            success: function(response) {
+                alert('密码修改成功！');
+                $('#changePasswordModal').modal('hide');
+                $('#changePasswordForm')[0].reset();
+                // 密码修改成功后可以选择是否退出登录
+                if (confirm('密码已修改成功，是否重新登录？')) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = '/login.html';
+                }
+            },
+            error: function(xhr) {
+                alert('密码修改失败：' + (xhr.responseText || '请重试'));
+            }
+        });
+    }
+
+    // 退出登录
+    function logout() {
+        if (confirm('确定要退出登录吗？')) {
+            localStorage.removeItem('currentUser');
+            window.location.href = '/login.html';
+        }
+    }
 </script>
 </body>
 </html>

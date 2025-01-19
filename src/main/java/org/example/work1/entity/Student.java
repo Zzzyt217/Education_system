@@ -3,6 +3,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "student")
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +21,8 @@ public class Student {
     private long roleId;
     private String className;
     private String college;
+    @Column(name = "userpass")
+    private String userpass;
 
     // Getters and Setters
     public Long getId() {
@@ -132,5 +135,13 @@ public class Student {
 
     public void setCollege(String college) {
         this.college = college;
+    }
+
+    public String getUserpass() {
+        return userpass;
+    }
+
+    public void setUserpass(String userpass) {
+        this.userpass = userpass;
     }
 }

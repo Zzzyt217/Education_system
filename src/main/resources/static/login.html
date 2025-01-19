@@ -120,6 +120,12 @@
                     console.log('服务器响应:', response);
                     if (response.success) {
                         console.log('登录成功，准备跳转...');
+                        // 保存用户信息到localStorage
+                        localStorage.setItem('currentUser', JSON.stringify({
+                            username: response.username,
+                            nickname: response.nickname,
+                            roleId: response.roleId
+                        }));
                         window.location.href = '/pages/main.html';
                     } else {
                         console.log('登录失败:', response.message);
