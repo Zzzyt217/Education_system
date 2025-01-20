@@ -462,6 +462,15 @@
         $('#addAdminModal').modal('show');
     }
     $(document).ready(function () {
+        // 获取当前用户信息
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const isAdmin = currentUser && currentUser.roleId === 2;
+
+        // 如果不是管理员，隐藏添加按钮
+        if (!isAdmin) {
+            $('.header-actions').hide();
+        }
+
         // 获取管理员数量
         $.get("/api/admin/count", function (data) {
             $("#adminCount").text(data);
@@ -472,12 +481,23 @@
             var table = $("table");
             table.append("<thead><tr><th>ID</th><th>用户名</th><th>昵称</th><th>角色</th><th>性别</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody>");
             $.each(data, function (index, admin) {
-                table.append("<tr><td>" + admin.id + "</td><td>" + admin.username + "</td><td>" + admin.nickname + "</td><td>" + admin.roleName + "</td><td>" + admin.sex + "</td><td>" + admin.phone + "</td><td>" + admin.email + "</td><td><button class='btn btn-primary btn-sm editAdmin' data-id='" + admin.id + "'> <i class=\"fas fa-edit\"></i>  </button> <button class='btn btn-danger btn-sm deleteAdmin' data-id='" + admin.id + "'> <i class=\"fas fa-trash\"></i> </button></td></tr>");
+                const operationButtons = isAdmin ? 
+                    `<button class='btn btn-primary btn-sm editAdmin' data-id='${admin.id}'><i class="fas fa-edit"></i></button> 
+                     <button class='btn btn-danger btn-sm deleteAdmin' data-id='${admin.id}'><i class="fas fa-trash"></i></button>` : 
+                    '';
+                table.append(`<tr>
+                    <td>${admin.id}</td>
+                    <td>${admin.username}</td>
+                    <td>${admin.nickname}</td>
+                    <td>${admin.roleName}</td>
+                    <td>${admin.sex}</td>
+                    <td>${admin.phone}</td>
+                    <td>${admin.email}</td>
+                    <td>${operationButtons}</td>
+                </tr>`);
             });
             table.append("</tbody>");
         });
-
-
 
         // 保存添加的管理员
         $('#saveAdminButton').click(function () {
@@ -604,6 +624,10 @@
             table.find("tbody").remove();
             var tbody = $("<tbody>");
             $.each(data, function(index, admin) {
+                const operationButtons = isAdmin ? 
+                    `<button class='btn btn-primary btn-sm editAdmin' data-id='${admin.id}'><i class="fas fa-edit"></i></button> 
+                     <button class='btn btn-danger btn-sm deleteAdmin' data-id='${admin.id}'><i class="fas fa-trash"></i></button>` : 
+                    '';
                 tbody.append(`<tr>
                     <td>${admin.id}</td>
                     <td>${admin.username}</td>
@@ -612,14 +636,7 @@
                     <td>${admin.sex}</td>
                     <td>${admin.phone}</td>
                     <td>${admin.email}</td>
-                    <td>
-                        <button class='btn btn-primary btn-sm editAdmin' data-id='${admin.id}'>
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class='btn btn-danger btn-sm deleteAdmin' data-id='${admin.id}'>
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
+                    <td>${operationButtons}</td>
                 </tr>`);
             });
             table.append(tbody);

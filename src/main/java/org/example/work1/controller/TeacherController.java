@@ -45,7 +45,6 @@ public class TeacherController {
     @PostMapping("/add")
     public ResponseEntity<String> addTeacher(@RequestBody Teacher teacher) {
         try {
-            // 设置默认角色ID为1（教师角色）
             teacher.setRoleId(1L);
             int result = teacherMapper.insertTeacher(teacher);
             if (result > 0) {
@@ -61,7 +60,6 @@ public class TeacherController {
     @PutMapping("/update")
     public ResponseEntity<String> updateTeacher(@RequestBody Teacher teacher) {
         try {
-            System.out.println("接收到的教师数据: " + teacher); // 添加日志
             int result = teacherMapper.updateTeacher(teacher);
             if (result > 0) {
                 return ResponseEntity.ok("success");
@@ -69,7 +67,7 @@ public class TeacherController {
                 return ResponseEntity.badRequest().body("failed");
             }
         } catch (Exception e) {
-            e.printStackTrace(); // 添加错误日志
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
