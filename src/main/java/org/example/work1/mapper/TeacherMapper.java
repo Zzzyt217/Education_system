@@ -5,6 +5,7 @@ import org.example.work1.entity.Teacher;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 @Repository
@@ -18,6 +19,14 @@ public interface TeacherMapper {
     // 新增方法：获取学院数
     @Select("SELECT COUNT(DISTINCT college) FROM teacher")
     int countColleges();
+
+    // 新增方法：按性别统计
+    @Select("SELECT COUNT(*) FROM teacher WHERE sex = #{sex}")
+    int countBySex(@Param("sex") int sex);
+
+    // 新增方法：获取学院分布
+    @Select("SELECT college, COUNT(*) as count FROM teacher GROUP BY college")
+    List<Map<String, Object>> getCollegeDistribution();
 
     // 新增方法：获取所有教师信息
     @Select("SELECT * FROM teacher")

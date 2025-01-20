@@ -6,27 +6,19 @@ import javax.persistence.*;
 @Table(name = "SC")
 public class SC {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "courseName")
     private String courseName;
 
     @Column(name = "username")
     private String username;
 
-    @Column(name = "coursetime")
-    private String coursetime;
+    @Column(name = "courseTime")
+    private String courseTime;
+
+    @Column(name = "classLocation")
+    private String classLocation;
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getCourseName() {
         return courseName;
     }
@@ -43,11 +35,19 @@ public class SC {
         this.username = username;
     }
 
-    public String getCoursetime() {
-        return coursetime;
+    public String getCourseTime() {
+        return courseTime;
     }
 
-    public void setCoursetime(String coursetime) {
-        this.coursetime = coursetime;
+    public void setCourseTime(String courseTime) {
+        this.courseTime = courseTime;
+    }
+
+    public String getClassLocation() {
+        return classLocation;
+    }
+
+    public void setClassLocation(String classLocation) {
+        this.classLocation = classLocation;
     }
 } 

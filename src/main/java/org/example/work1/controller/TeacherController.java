@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -75,5 +77,30 @@ public class TeacherController {
     @GetMapping("/{id}")
     public Teacher getTeacherById(@PathVariable Long id) {
         return teacherMapper.findById(id);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getTeacherCount() {
+        return ResponseEntity.ok(teacherMapper.count());
+    }
+
+    @GetMapping("/countColleges")
+    public ResponseEntity<Integer> getCollegeCount() {
+        return ResponseEntity.ok(teacherMapper.countColleges());
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Object>> getTeacherStats() {
+        Map<String, Object> stats = new HashMap<>();
+        try {
+            stats.put("total", teacherMapper.count());
+            stats.put("male", teacherMapper.countBySex(1));
+            stats.put("female", teacherMapper.countBySex(0));
+            stats.put("collegeDistribution", teacherMapper.getCollegeDistribution());
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

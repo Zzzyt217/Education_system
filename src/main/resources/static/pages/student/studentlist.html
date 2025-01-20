@@ -203,6 +203,9 @@
             学生列表
         </h1>
         <div class="header-actions">
+            <button class="btn btn-success me-2" onclick="exportToExcel()">
+                <i class="fas fa-file-excel"></i> 导出Excel
+            </button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
                 <i class="fas fa-plus"></i> 添加学生
             </button>
@@ -354,35 +357,36 @@
 
                     if (students.length === 0) {
                         console.log('没有找到匹配的学生');
-                        tbody.innerHTML = '<tr><td colspan="8" class="text-center">没有找到匹配的学生</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="9" class="text-center">没有找到匹配的学生</td></tr>';
                         return;
                     }
 
                     students.forEach(student => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${student.username}</td>
-                            <td>${student.sex === 1 ? '男' : '女'}</td>
-                            <td>${formatDate(student.birthday)}</td>
-                            <td>${student.phone}</td>
-                            <td>${student.address || '-'}</td>
-                            <td>
-                                <span class="badge ${getStatusBadgeClass(student.status)}">
-                                    ${getStatusText(student.status)}
-                                </span>
-                            </td>
-                            <td>${student.college || '-'}</td>
-                            <td>${student.className || '-'}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-1" onclick="editStudent(${student.id})">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
+                        const row = `
+                            <tr>
+                                <td>${student.username}</td>
+                                <td>${student.sex === 1 ? '男' : '女'}</td>
+                                <td>${formatDate(student.birthday)}</td>
+                                <td>${student.phone}</td>
+                                <td>${student.address || '-'}</td>
+                                <td>
+                                    <span class="badge ${getStatusBadgeClass(student.status)}">
+                                        ${getStatusText(student.status)}
+                                    </span>
+                                </td>
+                                <td>${student.college || '-'}</td>
+                                <td>${student.className || '-'}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary me-1" onclick="editStudent(${student.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteStudent(${student.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
                         `;
-                        tbody.appendChild(tr);
+                        $(tbody).append(row);
                     });
                     console.log('表格更新完成');
                 })
@@ -558,6 +562,11 @@
 
     function editStudent(id) {
         window.location.href = `student-info.html?id=${id}`;
+    }
+
+    // 导出Excel功能
+    function exportToExcel() {
+        window.location.href = '/api/students/export';
     }
 </script>
 

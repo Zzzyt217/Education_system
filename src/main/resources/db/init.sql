@@ -105,3 +105,13 @@ CREATE TABLE IF NOT EXISTS `user` (
 INSERT INTO `user` (`username`, `password`) VALUES
 ('admin', '123456'),
 ('test', 'test123');
+
+-- 选课信息表
+CREATE TABLE IF NOT EXISTS SC (
+    courseName VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    courseTime VARCHAR(50) NOT NULL,
+    classLocation VARCHAR(50) NOT NULL,
+    FOREIGN KEY (courseName) REFERENCES course(courseName),
+    FOREIGN KEY (username) REFERENCES student(username)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

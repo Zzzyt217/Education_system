@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface SCRepository extends JpaRepository<SC, Long> {
     @Query(value = "SELECT DISTINCT s.username, st.classname, st.phone " +
-           "FROM sc s " +
+           "FROM SC s " +
            "JOIN student st ON s.username = st.username " +
            "WHERE s.courseName = :courseName " +
            "ORDER BY st.classname, s.username", 
@@ -19,7 +19,7 @@ public interface SCRepository extends JpaRepository<SC, Long> {
     List<Object[]> findStudentsByCourse(@Param("courseName") String courseName);
 
     @Query(value = "SELECT DISTINCT s.courseName, s.courseTime, s.classLocation " +
-           "FROM sc s " +
+           "FROM SC s " +
            "WHERE s.courseName IS NOT NULL " +
            "AND s.courseTime IS NOT NULL " +
            "AND s.classLocation IS NOT NULL " +

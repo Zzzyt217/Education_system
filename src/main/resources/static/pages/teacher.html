@@ -194,11 +194,6 @@
             <i class="fas fa-chalkboard-teacher"></i>
             教师管理
         </h1>
-        <div class="header-actions">
-            <button class="btn btn-primary" onclick="showAddTeacher()">
-                <i class="fas fa-plus"></i> 添加教师
-            </button>
-        </div>
     </div>
 
     <!-- 统计卡片 -->
@@ -223,104 +218,142 @@
         </div>
     </div>
 
-
-    <div id="teacher-list" class="teacher-list"></div>
-
-
-    <!-- 添加/编辑教师模态框 -->
-    <div class="modal fade" id="teacherModal" tabindex="-1" aria-labelledby="teacherModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="teacherModalLabel">添加教师</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="teacherForm">
-                        <div class="mb-3">
-                            <label class="form-label">工号</label>
-                            <input type="text" class="form-control" name="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">密码</label>
-                            <input type="password" class="form-control" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">性别</label>
-                            <select class="form-control" name="sex" required>
-                                <option value="1">男</option>
-                                <option value="2">女</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">生日</label>
-                            <input type="date" class="form-control" name="birthday" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">职称</label>
-                            <select class="form-control" name="rank" required>
-                                <option value="1">教授</option>
-                                <option value="2">副教授</option>
-                                <option value="3">讲师</option>
-                                <option value="4">助教</option>
-                            </select>
-                        </div>
-                        <div id="teacherList"></div>
-                        <div class="mb-3">
-                            <label class="form-label">学院</label>
-                            <input type="text" class="form-control" name="college" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">电话</label>
-                            <input type="tel" class="form-control" name="phone" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" onclick="saveTeacher()">保存</button>
+    <!-- 添加图表容器 -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">性别比例</h5>
+                    <canvas id="genderChart"></canvas>
                 </div>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">学院分布</h5>
+                    <canvas id="collegeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <!-- 脚本引用 -->
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
         $(document).ready(function() {
             // 加载总教师数和学院数
             loadStats();
-            // 加载教师列表
-            loadTeacherList();
+            // 加载图表数据
+            loadCharts();
         });
 
         function loadStats() {
             // 请求总教师数
             $.ajax({
-                url: '/api/teacher/count', // 假设后端接口为 /api/teacher/count
+                url: '/api/teacher/count',
                 method: 'GET',
                 success: function(response) {
                     $('.stats-cards .stat-card:first-child h3').text(response);
                 },
-                error: function() {
-                    console.error('请求总教师数失败');
+                error: function(xhr, status, error) {
+                    console.error('请求总教师数失败:', error);
+                    $('.stats-cards .stat-card:first-child h3').text('--');
                 }
             });
 
             // 请求学院数
             $.ajax({
-                url: '/api/teacher/countColleges', // 假设后端接口为 /api/teacher/countColleges
+                url: '/api/teacher/countColleges',
                 method: 'GET',
                 success: function(response) {
                     $('.stats-cards .stat-card:last-child h3').text(response);
                 },
-                error: function() {
-                    console.error('请求学院数失败');
+                error: function(xhr, status, error) {
+                    console.error('请求学院数失败:', error);
+                    $('.stats-cards .stat-card:last-child h3').text('--');
                 }
             });
         }
 
+        function loadCharts() {
+            $.ajax({
+                url: '/api/teacher/stats',
+                method: 'GET',
+                success: function(response) {
+                    // 性别分布图表
+                    const genderCtx = document.getElementById('genderChart').getContext('2d');
+                    new Chart(genderCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['男教师', '女教师'],
+                            datasets: [{
+                                data: [response.male, response.female],
+                                backgroundColor: ['rgba(52,152,219,0.2)', 'rgba(155,89,182,0.2)'],
+                                borderColor: ['rgba(52,152,219,1)', 'rgba(155,89,182,1)'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+
+                    // 学院分布图表
+                    const collegeData = response.collegeDistribution;
+                    const collegeLabels = collegeData.map(item => item.college);
+                    const collegeCounts = collegeData.map(item => item.count);
+                    const collegeCtx = document.getElementById('collegeChart').getContext('2d');
+                    new Chart(collegeCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: collegeLabels,
+                            datasets: [{
+                                data: collegeCounts,
+                                backgroundColor: [
+                                        'rgba(52,152,219,0.2)',  // 蓝色
+                                        'rgba(155,89,182,0.2)',  // 紫色
+                                        'rgba(46,204,113,0.2)',  // 绿色
+                                        'rgba(241,196,15,0.2)',  // 黄色
+                                        'rgba(231,76,60,0.2)',   // 红色
+                                        'rgba(142,68,175,0.5)',  // 深紫色
+                                        'rgba(26,188,170,0.4)'    // 青色
+                                ],
+                                borderColor: [
+                                        'rgba(52,152,219,1)',    // 蓝色边框
+                                        'rgba(155,89,182,1)',    // 紫色边框
+                                        'rgba(46,204,113,1)',    // 绿色边框
+                                        'rgba(241,196,15,1)',    // 黄色边框
+                                        'rgba(231,76,60,0.8)',     // 红色边框
+                                        'rgba(142,68,175,1)',    // 深紫色边框
+                                        'rgba(26,188,170,1)'     // 青色边框
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'right'
+                                }
+                            }
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('加载图表数据失败:', error);
+                }
+            });
+        }
     </script>
 </body>
 </html>

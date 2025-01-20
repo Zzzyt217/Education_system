@@ -117,15 +117,31 @@
                     password: password
                 }),
                 success: function(response) {
-                    console.log('服务器响应:', response);
+                    console.log('===== 登录响应数据 =====');
+                    console.log('完整响应:', JSON.stringify(response, null, 2));
+                    console.log('用户名:', response.username);
+                    console.log('角色ID:', response.roleId);
+                    console.log('性别:', response.sex);
+                    console.log('电话:', response.phone);
+                    
                     if (response.success) {
-                        console.log('登录成功，准备跳转...');
-                        // 保存用户信息到localStorage
-                        localStorage.setItem('currentUser', JSON.stringify({
+                        console.log('===== 保存到localStorage的数据 =====');
+                        const userInfo = {
                             username: response.username,
                             nickname: response.nickname,
-                            roleId: response.roleId
-                        }));
+                            roleId: response.roleId,
+                            sex: response.sex,
+                            phone: response.phone,
+                            email: response.email
+                        };
+                        console.log('userInfo对象:', JSON.stringify(userInfo, null, 2));
+                        localStorage.setItem('currentUser', JSON.stringify(userInfo));
+                        
+                        // 验证保存后的数据
+                        const savedData = JSON.parse(localStorage.getItem('currentUser'));
+                        console.log('===== 验证localStorage中的数据 =====');
+                        console.log('保存的数据:', JSON.stringify(savedData, null, 2));
+                        
                         window.location.href = '/pages/main.html';
                     } else {
                         console.log('登录失败:', response.message);

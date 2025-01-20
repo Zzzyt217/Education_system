@@ -604,7 +604,23 @@
             table.find("tbody").remove();
             var tbody = $("<tbody>");
             $.each(data, function(index, admin) {
-                tbody.append("<tr><td>" + admin.id + "</td><td>" + admin.username + "</td><td>" + admin.nickname + "</td><td>" + admin.roleName + "</td><td>" + admin.sex + "</td><td>" + admin.phone + "</td><td>" + admin.email + "</td><td><button class='btn btn-primary btn-sm editAdmin' data-id='" + admin.id + "'>修改</button><button class='btn btn-danger btn-sm deleteAdmin' data-id='" + admin.id + "'>删除</button></td></tr>");
+                tbody.append(`<tr>
+                    <td>${admin.id}</td>
+                    <td>${admin.username}</td>
+                    <td>${admin.nickname}</td>
+                    <td>${admin.roleName}</td>
+                    <td>${admin.sex}</td>
+                    <td>${admin.phone}</td>
+                    <td>${admin.email}</td>
+                    <td>
+                        <button class='btn btn-primary btn-sm editAdmin' data-id='${admin.id}'>
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class='btn btn-danger btn-sm deleteAdmin' data-id='${admin.id}'>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`);
             });
             table.append(tbody);
         }

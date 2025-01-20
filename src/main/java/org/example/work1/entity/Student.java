@@ -3,22 +3,49 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "student")
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "username")
     private String username;
+
+    @Column(name = "sex")
     private int sex;
+
+    @Column(name = "birthday")
     private String birthday;
+
+    @Column(name = "phone")
     private String phone;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "address")
     private String address;
+
+    @Column(name = "note")
     private String note;
+
+    @Column(name = "status")
     private int status;
+
+    @Column(name = "levelId")
     private int levelId;
+
+    @Column(name = "createTime")
     private LocalDateTime createTime;
+
+    @Column(name = "roleId")
     private long roleId;
+
+    @Column(name = "classname")
     private String className;
+
+    @Column(name = "college")
     private String college;
 
     // Getters and Setters

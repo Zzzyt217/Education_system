@@ -355,6 +355,9 @@
             </div>
         </div>
         <div class="user-actions">
+            <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#userInfoModal">
+                <i class="fas fa-user-circle"></i> 个人信息
+            </button>
             <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
                 <i class="fas fa-key"></i> 修改密码
             </button>
@@ -364,6 +367,49 @@
         </div>
     </div>
 </nav>
+
+<!-- 个人信息模态框 -->
+<div class="modal fade" id="userInfoModal" tabindex="-1" role="dialog" aria-labelledby="userInfoModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userInfoModalLabel">个人信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userInfoForm">
+                    <div class="mb-3">
+                        <label class="form-label" for="infoUsername">用户名</label>
+                        <input type="text" class="form-control" id="infoUsername" readonly>
+                    </div>
+                    <div class="mb-3 admin-only" style="display: none;">
+                        <label class="form-label" for="infoNickname">昵称</label>
+                        <input type="text" class="form-control" id="infoNickname" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="infoRole">角色</label>
+                        <input type="text" class="form-control" id="infoRole" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="infoSex">性别</label>
+                        <input type="text" class="form-control" id="infoSex" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="infoPhone">电话</label>
+                        <input type="text" class="form-control" id="infoPhone" readonly>
+                    </div>
+                    <div class="mb-3 admin-only" style="display: none;">
+                        <label class="form-label" for="infoEmail">邮箱</label>
+                        <input type="email" class="form-control" id="infoEmail" readonly>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="changePasswordModal">
     <div class="modal-dialog">
@@ -440,7 +486,7 @@
                 </div>
                 <div>
                     <p class="stat-title">总课程数</p>
-                    <h3 class="stat-value" data-type="courses">86</h3>
+                    <h3 class="stat-value" data-type="courses"></h3>
                 </div>
             </div>
         </div>
@@ -529,14 +575,71 @@
     $(document).ready(function() {
         // 从localStorage获取用户信息
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        console.log('===== main.html中的用户信息 =====');
+        console.log('localStorage中的数据:', JSON.stringify(currentUser, null, 2));
+
         if (currentUser) {
+            // 设置用户名和角色
             $('.user-name').text(currentUser.nickname || currentUser.username);
             $('.user-role').text(currentUser.roleId === 2 ? '管理员' : '教师');
-            // 设置欢迎语句
             $('.welcome-title').text('欢迎回来，' + (currentUser.roleId === 2 ? '管理员' : '教师'));
+
+            // 直接设置表单字段
+            document.getElementById('infoUsername').value = currentUser.username;
+            document.getElementById('infoRole').value = currentUser.roleId === 2 ? '管理员' : '教师';
+            
+            // 设置性别
+            console.log('当前性别值:', currentUser.sex);
+            const sexValue = currentUser.sex ? (currentUser.sex === '1' ? '男' : '女') : '男';
+            console.log('转换后的性别值:', sexValue);
+            document.getElementById('infoSex').value = sexValue;
+            
+            // 设置电话
+            document.getElementById('infoPhone').value = currentUser.phone || '';
+
+            console.log('===== 设置表单值 =====');
+            console.log('用户名:', document.getElementById('infoUsername').value);
+            console.log('角色:', document.getElementById('infoRole').value);
+            console.log('性别:', document.getElementById('infoSex').value);
+            console.log('电话:', document.getElementById('infoPhone').value);
+
+            // 管理员特有字段
+            if (currentUser.roleId === 2) {
+                $('.admin-only').show();
+                document.getElementById('infoNickname').value = currentUser.nickname || '';
+                document.getElementById('infoEmail').value = currentUser.email || '';
+            } else {
+                $('.admin-only').hide();
+            }
         } else {
-            // 如果没有用户信息，重定向到登录页
             window.location.href = '/login.html';
+        }
+    });
+
+    // 添加模态框显示事件监听器
+    $('#userInfoModal').on('show.bs.modal', function () {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser) {
+            // 重新设置字段值，确保显示正确
+            $('#infoUsername').val(currentUser.username);
+            $('#infoRole').val(currentUser.roleId === 2 ? '管理员' : '教师');
+            
+            // 设置性别
+            console.log('模态框 - 当前性别值:', currentUser.sex);
+            const sexValue = currentUser.sex ? (currentUser.sex === '1' ? '男' : '女') : '男';
+            console.log('模态框 - 转换后的性别值:', sexValue);
+            $('#infoSex').val(sexValue);
+            
+            // 设置其他字段
+            $('#infoPhone').val(currentUser.phone || '');
+            
+            if (currentUser.roleId === 2) {
+                $('.admin-only').show();
+                $('#infoNickname').val(currentUser.nickname || '');
+                $('#infoEmail').val(currentUser.email || '');
+            } else {
+                $('.admin-only').hide();
+            }
         }
     });
 
