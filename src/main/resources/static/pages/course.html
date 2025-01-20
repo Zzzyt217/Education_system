@@ -493,16 +493,17 @@
                 url: '/api/course/delete/' + id,
                 method: 'DELETE',
                 success: function(response) {
-                    if (response.code === 200) {
+                    if (response && response.code === 200) {
                         alert('删除成功');
                         loadCourses(); // 重新加载课程列表
                         getCourseStats(); // 更新统计数据
                     } else {
-                        alert('删除失败：' + response.msg);
+                        alert('删除失败：' + (response ? response.msg : '未知错误'));
                     }
                 },
-                error: function(xhr) {
-                    alert('删除失败：' + xhr.statusText);
+                error: function(xhr, status, error) {
+                    console.error('删除失败:', error);
+                    alert('删除失败：' + error);
                 }
             });
         }

@@ -462,7 +462,7 @@
         $('#addAdminModal').modal('show');
     }
     $(document).ready(function () {
-        // 获取当前用户信息
+        // 获取当前登录用户信息
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         const isAdmin = currentUser && currentUser.roleId === 2;
 
@@ -479,25 +479,24 @@
         // 获取所有管理员信息
         $.get("/api/admin/all", function (data) {
             var table = $("table");
-            table.append("<thead><tr><th>ID</th><th>用户名</th><th>昵称</th><th>角色</th><th>性别</th><th>电话</th><th>邮箱</th><th>操作</th></tr></thead><tbody>");
+            table.append("<thead><tr><th>ID</th><th>用户名</th><th>昵称</th><th>角色</th><th>性别</th><th>电话</th><th>邮箱</th>" + (isAdmin ? "<th>操作</th>" : "") + "</tr></thead><tbody>");
             $.each(data, function (index, admin) {
-                const operationButtons = isAdmin ? 
-                    `<button class='btn btn-primary btn-sm editAdmin' data-id='${admin.id}'><i class="fas fa-edit"></i></button> 
-                     <button class='btn btn-danger btn-sm deleteAdmin' data-id='${admin.id}'><i class="fas fa-trash"></i></button>` : 
-                    '';
-                table.append(`<tr>
-                    <td>${admin.id}</td>
-                    <td>${admin.username}</td>
-                    <td>${admin.nickname}</td>
-                    <td>${admin.roleName}</td>
-                    <td>${admin.sex}</td>
-                    <td>${admin.phone}</td>
-                    <td>${admin.email}</td>
-                    <td>${operationButtons}</td>
-                </tr>`);
+                var row = "<tr><td>" + admin.id + "</td><td>" + admin.username + "</td><td>" + admin.nickname + 
+                         "</td><td>" + admin.roleName + "</td><td>" + admin.sex + "</td><td>" + admin.phone + 
+                         "</td><td>" + admin.email + "</td>";
+                if (isAdmin) {
+                    row += "<td><button class='btn btn-primary btn-sm editAdmin' data-id='" + admin.id + 
+                           "'><i class=\"fas fa-edit\"></i></button> " +
+                           "<button class='btn btn-danger btn-sm deleteAdmin' data-id='" + admin.id + 
+                           "'><i class=\"fas fa-trash\"></i></button></td>";
+                }
+                row += "</tr>";
+                table.append(row);
             });
             table.append("</tbody>");
         });
+
+
 
         // 保存添加的管理员
         $('#saveAdminButton').click(function () {
@@ -620,24 +619,33 @@
 
         // 更新表格内容的函数
         function updateTable(data) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const isAdmin = currentUser && currentUser.roleId === 2;
+
             var table = $("table");
             table.find("tbody").remove();
             var tbody = $("<tbody>");
             $.each(data, function(index, admin) {
-                const operationButtons = isAdmin ? 
-                    `<button class='btn btn-primary btn-sm editAdmin' data-id='${admin.id}'><i class="fas fa-edit"></i></button> 
-                     <button class='btn btn-danger btn-sm deleteAdmin' data-id='${admin.id}'><i class="fas fa-trash"></i></button>` : 
-                    '';
-                tbody.append(`<tr>
+                var row = `<tr>
                     <td>${admin.id}</td>
                     <td>${admin.username}</td>
                     <td>${admin.nickname}</td>
                     <td>${admin.roleName}</td>
                     <td>${admin.sex}</td>
                     <td>${admin.phone}</td>
-                    <td>${admin.email}</td>
-                    <td>${operationButtons}</td>
-                </tr>`);
+                    <td>${admin.email}</td>`;
+                if (isAdmin) {
+                    row += `<td>
+                        <button class='btn btn-primary btn-sm editAdmin' data-id='${admin.id}'>
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class='btn btn-danger btn-sm deleteAdmin' data-id='${admin.id}'>
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>`;
+                }
+                row += `</tr>`;
+                tbody.append(row);
             });
             table.append(tbody);
         }

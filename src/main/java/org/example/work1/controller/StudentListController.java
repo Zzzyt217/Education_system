@@ -3,6 +3,7 @@ package org.example.work1.controller;
 import org.example.work1.entity.Student;
 import org.example.work1.mapper.StudentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
@@ -14,6 +15,9 @@ public class StudentListController {
     @Autowired
     private StudentMapper studentMapper;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @GetMapping("/list")
     @ResponseBody
     public List<Student> getAllStudents() {
@@ -23,8 +27,24 @@ public class StudentListController {
     @DeleteMapping("/{id}")
     @ResponseBody
     public String deleteStudent(@PathVariable("id") Long id) {
-        int result = studentMapper.deleteStudent(id);
-        return result > 0 ? "success" : "fail";
+        try {
+            // 先获取要删除的学生信息
+            Student student = studentMapper.getStudentById(id);
+            if (student == null) {
+                return "fail";
+            }
+
+            // 先删除选课表中的关联记录
+            String username = student.getUsername();
+            jdbcTemplate.update("DELETE FROM SC WHERE username = ?", username);
+
+            // 然后删除学生
+            int result = studentMapper.deleteStudent(id);
+            return result > 0 ? "success" : "fail";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
     }
 
     @PostMapping("/add")

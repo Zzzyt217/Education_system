@@ -3,6 +3,7 @@ package org.example.work1.controller;
 import org.example.work1.entity.Course;
 import org.example.work1.repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,9 @@ public class CourseController {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @GetMapping("/stats")
     public Map<String, Object> getCourseStats() {
@@ -95,13 +99,28 @@ public class CourseController {
     public ResponseEntity<Map<String, Object>> deleteCourse(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
+            // 先获取要删除的课程信息
+            Course course = courseRepository.findById(id).orElse(null);
+            if (course == null) {
+                response.put("code", 400);
+                response.put("msg", "课程不存在");
+                return ResponseEntity.ok(response);
+            }
+
+            // 先删除选课表中的关联记录
+            String courseName = course.getCourseName();
+            jdbcTemplate.update("DELETE FROM SC WHERE courseName = ?", courseName);
+
+            // 然后删除课程
             courseRepository.deleteById(id);
+            
             response.put("code", 200);
             response.put("msg", "删除成功");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            e.printStackTrace();
             response.put("code", 500);
-            response.put("msg", "删除失败");
+            response.put("msg", "删除失败: " + e.getMessage());
             return ResponseEntity.ok(response);
         }
     }
